@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, Fragment } from "react";
 import {
   Box,
   Title,
@@ -14,11 +14,11 @@ import { useBreedImageUrl, useBreed } from "../APIs/cats";
 import { BsWikipedia, BsFillHeartFill } from "react-icons/bs";
 import { BiHomeSmile } from "react-icons/bi";
 import { MdArrowBack, MdChildFriendly, MdEnergySavingsLeaf } from "react-icons/md";
-import { FaDog, FaCat } from "react-icons/fa";
+import { FaDog, FaCat, FaSmileBeam } from "react-icons/fa";
 import { RiKakaoTalkFill } from "react-icons/ri";
 import { IoPeople } from "react-icons/io5";
 import { GiHairStrands, GiComb, GiHealthNormal, GiBrain } from "react-icons/gi";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 export function CatBreed() {
   const { breedId } = useParams();
@@ -36,6 +36,7 @@ export function CatBreed() {
         p={rem(16)}
         sx={{
           width: '100%',
+          boxSizing: 'border-box'
         }}
       >
         <Button variant='outline' leftIcon={<MdArrowBack />} onClick={goBack}>Back</Button>
@@ -98,110 +99,191 @@ function WikipediaLink({ breed }) {
 
 const attributes = {
   adaptability: {
-    display: "Adaptable",
+    display: {
+      high: "Adapts Well",
+      low: "Does not Adapt Well",
+    },
     Icon: BiHomeSmile,
   },
   affection_level: {
-    display: "Affectionate",
+    display: {
+      high: "Very Affectionate",
+      low: "Independent",
+    },
     Icon: BsFillHeartFill,
+    ambiguous: true
   },
   child_friendly: {
-    display: "Child Friendly",
+    display: {
+      high: "Child Friendly",
+      low: "Not Child Friendly",
+    },
     Icon: MdChildFriendly,
   },
   dog_friendly: {
-    display: "Dog Friendly",
+    display: {
+      high: "Dog Friendly",
+      low: "Not Dog Friendly",
+    },
     Icon: FaDog,
   },
   energy_level: {
-    display: "High Energy",
+    display: {
+      high: "High Energy",
+      low: "Low Energy",
+    },
     Icon: MdEnergySavingsLeaf,
+    ambiguous: true
   },
   grooming: {
-    display: "Groomable",
+    display: {
+      high: "Self Maintaining",
+      low: "Needs lots of Grooming",
+    },
     Icon: GiComb,
+    inverse: true
   },
   health_issues: {
-    display: "Health Issues",
+    display: {
+      high: undefined,
+      low: "Prone to health issues",
+    },
     Icon: GiHealthNormal,
+    inverse: true
   },
   intelligence: {
-    display: "Intelligent",
+    display: {
+      high: "Intelligent",
+      low: undefined,
+    },
     Icon: GiBrain,
   },
   shedding_level: {
-    display: "Shedding",
+    display: {
+      high: "Little Shedding",
+      low: "Sheds a lot",
+    },
     Icon: GiHairStrands,
+    inverse: true
   },
   social_needs: {
-    display: "Social Needs",
+    display: {
+      high: "Social",
+      low: "Not Social",
+    },
     Icon: FaCat,
   },
   stranger_friendly: {
-    display: "Stranger Friendly",
+    display: {
+      high: "Stranger Friendly",
+      low: "Not Stranger Friendly",
+    },
     Icon: IoPeople,
   },
   vocalisation: {
-    display: "Vocal",
+    display: {
+      high: "Vocal",
+      low: "Quiet",
+    },
     Icon: RiKakaoTalkFill,
+    ambiguous: true
   },
 };
 
 function BreedKnownFors({ breed }) {
-  const { highs, lows } = useMemo(() => {
+  const values = useMemo(() => {
     const values = Object.entries(breed).filter(
       ([key, value]) => key in attributes
     );
-    return {
-      highs: values.filter(([_, value]) => value === 5),
-      lows: values.filter(([_, value]) => value === 1),
+
+    const highest = Math.max(
+      4,
+      values.reduce(
+        (acc, [key, value]) => (value > acc ? value : acc), 0
+      )
+    )
+
+    const findSortKey = (attr, value) => {
+      const [low, high] = Boolean(attr.inverse) ? ['high', 'low'] : ['low', 'high'];
+      return (value === 1) ? low : high;
+    }
+
+    const MapToElement = ([sortKey, key]) => {
+      const attr = attributes[key];
+      const Icon = attr.Icon;
+      const display = attr.display[sortKey];
+      let bg;
+      if (attr.ambiguous) {
+        bg = 'yellow';
+      } else {
+        switch (sortKey) {
+          case 'high':
+            bg = 'green';
+            break;
+          case 'low':
+            bg = 'red';
+            break;
+        }
+      }
+
+      console.log(sortKey, key, display, bg);
+
+      const element = display && (
+        <Card
+          bg={bg}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: rem(8),
+          }}
+        >
+          <Icon />
+          <Text>{display}</Text>
+        </Card>
+      );
+
+      return [key, element];
     };
+
+    const allowed = values
+      .filter(([_, value]) => value === highest || value === 1);
+
+    const sorted = {};
+    for (const [key, value] of allowed) {
+      const attr = attributes[key];
+      const sortKey = findSortKey(attr, value);
+      const sortedKey = attr.ambiguous ? 'ambiguous' : sortKey;
+      // Get the array of values for this key, or create a new one
+      const arr = sorted[sortedKey] ?? [];
+      arr.push([sortKey, key]);
+
+      if (!(sortedKey in sorted)) {
+        sorted[sortedKey] = arr;
+      }
+    }
+
+    console.log(sorted);
+
+    return [
+      sorted['high'] ?? [],
+      sorted['ambiguous'] ?? [],
+      sorted['low'] ?? []
+    ].flat().map(MapToElement);
   }, [breed]);
 
   return (
-    <Grid spacing={32} py={32} sx={{ width: "100%", boxSizing: "border-box" }}>
-      <Grid.Col span={6}>
-        <Card sx={{ width: "100%" }} bg="green">
-          <Title order={4}>Best Known For</Title>
-          {highs.map(([key]) => {
-            const attr = attributes[key];
-            return (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: rem(8),
-                }}
-                py={8}
-              >
-                <attr.Icon fontSize={rem(24)} />
-                <Text>{attr.display}</Text>
-              </Box>
-            );
-          })}
-        </Card>
-      </Grid.Col>
-      <Grid.Col span={6}>
-        <Card sx={{ width: "100%" }} bg="red">
-          <Title order={4}>Least Known For</Title>
-          {lows.map(([key]) => {
-            const attr = attributes[key];
-            return (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: rem(8),
-                }}
-                py={8}
-              >
-                <attr.Icon fontSize={rem(24)} />
-                <Text>{attr.display}</Text>
-              </Box>
-            );
-          })}
-        </Card>
-      </Grid.Col>
-    </Grid>
+    <Box py={rem(32)} sx={{ display: 'flex', flexDirection: 'column', width: "100%", boxSizing: "border-box", justifyContent: 'center', gap: rem(16) }}>
+      {values.map(([key, value]) => (
+        <Fragment key={key}>
+          {value}
+        </Fragment>
+      ))}
+    </Box>
   );
+}
+
+const AttributeOrder = {
+  Low: -1,
+  High: 1,
+  Middle: 0
 }

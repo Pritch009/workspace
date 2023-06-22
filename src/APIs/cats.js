@@ -66,7 +66,7 @@ export function useBreed(breedId) {
 
     return { breed };
   } else {
-    return { error: error ?? "Unknown error occurred while fetching breed!" };
+    return { error: breeds.error ?? "Unknown error occurred while fetching breed!" };
   }
 }
 

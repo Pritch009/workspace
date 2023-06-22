@@ -32,7 +32,7 @@ export function SearchBar({ searchResultsContainerRef }) {
         setSuggestions(results.filter(({ score }) => score < 0.3));
       } else {
         let randomOrder = breeds
-          .sort(() => Math.random())
+          .sort(({ name: a }, { name: b }) => a.localeCompare(b))
           .map((item) => ({ item }));
         setSuggestions(randomOrder);
       }
