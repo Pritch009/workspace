@@ -1,17 +1,19 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { Box, rem, Title } from "@mantine/core";
 import { SearchBar } from "./searchBar";
 import { CatBreed } from "./catBreed";
 import { useLocation } from "react-router-dom";
+import { SearchResultsContainer } from "./searchResults";
 
 export function MainFunctional() {
   const [selected, setSelected] = useState(null);
   const location = useLocation();
+  const searchResultsContainerRef = useRef(null);
 
   const searchParams = useMemo(() => {
     return new URLSearchParams(location.search);
   }, [location]);
-  
+
   const onSelectSearchOption = (suggestion) => {
     setSelected(suggestion);
   };
@@ -38,8 +40,10 @@ export function MainFunctional() {
       style={{ flexDirection: "column", gap: rem(16) }}
     >
       <Title>Search Cats!</Title>
-      <SearchBar selected={selected} onSelect={onSelectSearchOption} />
-      {selected && <CatBreed breed={selected} />}
+      <SearchBar
+        searchResultsContainerRef={searchResultsContainerRef}
+      />
+      <SearchResultsContainer ref={searchResultsContainerRef} />
     </Box>
   );
 }

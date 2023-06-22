@@ -1,47 +1,80 @@
 import { useMemo } from "react";
-import { Box, Title, Text, Card, rem, Tooltip, Grid } from "@mantine/core";
-import { useBreedImageUrl } from "../APIs/cats";
+import {
+  Box,
+  Title,
+  Text,
+  Card,
+  rem,
+  Tooltip,
+  Grid,
+  Alert,
+  Button,
+} from "@mantine/core";
+import { useBreedImageUrl, useBreed } from "../APIs/cats";
 import { BsWikipedia, BsFillHeartFill } from "react-icons/bs";
 import { BiHomeSmile } from "react-icons/bi";
-import { MdChildFriendly, MdEnergySavingsLeaf } from "react-icons/md";
+import { MdArrowBack, MdChildFriendly, MdEnergySavingsLeaf } from "react-icons/md";
 import { FaDog, FaCat } from "react-icons/fa";
 import { RiKakaoTalkFill } from "react-icons/ri";
 import { IoPeople } from "react-icons/io5";
 import { GiHairStrands, GiComb, GiHealthNormal, GiBrain } from "react-icons/gi";
+import { useParams } from "react-router-dom";
 
-export function CatBreed({ breed }) {
-  const imageUrl = useBreedImageUrl(breed.id);
+export function CatBreed() {
+  const { breedId } = useParams();
+  const { breed, error } = useBreed(breedId);
+  const imageUrl = useBreedImageUrl(breedId);
+  const navigate = useNavigate();
+
+  const goBack = () => {
+    navigate(-1);
+  };
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        paddingTop: rem(16),
-        paddingBottom: rem(16),
-      }}
-    >
-      {imageUrl && (
-        <img
-          src={imageUrl}
-          alt={`Image of ${breed.name} cat.`}
-          style={{
-            width: "100%",
-            maxWidth: "350px",
-            objectFit: "cover",
-          }}
-        />
-      )}
-      <Title py={16}>{breed?.name}</Title>
-      <Card>
-        <Text>{breed.description}</Text>
-      </Card>
+    <>
+      <Box
+        p={rem(16)}
+        sx={{
+          width: '100%',
+        }}
+      >
+        <Button variant='outline' leftIcon={<MdArrowBack />} onClick={goBack}>Back</Button>
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          paddingTop: rem(16),
+          paddingBottom: rem(16),
+        }}
+      >
+        {error && <Alert title="Failed to load breed!">{error}</Alert>}
+        {breed && (
+          <>
+            {imageUrl && (
+              <img
+                src={imageUrl}
+                alt={`Image of ${breed.name} cat.`}
+                style={{
+                  width: "100%",
+                  maxWidth: "350px",
+                  objectFit: "cover",
+                }}
+              />
+            )}
+            <Title py={16}>{breed?.name}</Title>
+            <Card>
+              <Text>{breed.description}</Text>
+            </Card>
 
-      <BreedKnownFors breed={breed} />
-      <WikipediaLink breed={breed} />
-    </Box>
+            <BreedKnownFors breed={breed} />
+            <WikipediaLink breed={breed} />
+          </>
+        )}
+      </Box>
+    </>
   );
 }
 

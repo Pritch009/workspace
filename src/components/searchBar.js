@@ -1,48 +1,48 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { BsSearchHeart } from "react-icons/bs";
-import { Box, Input, rem, Title, Text, Alert } from "@mantine/core";
+import { Box, Input, rem, Title, Text, Alert, Portal } from "@mantine/core";
 import { useBreeds } from "../APIs/cats";
 import Fuse from "fuse.js";
 import { useClickOutside } from "@mantine/hooks";
+import { useLocation } from "react-router-dom";
 
 const fuseOptions = {
   includeScore: true,
   keys: ["name", "origin"],
 };
 
-export function SearchBar({ onSelect, selected }) {
+export function SearchBar({ searchResultsContainerRef }) {
   const { data: breeds, loading: loadingBreeds, error } = useBreeds();
   const [err, setErr] = useState(null);
   const [searchValue, setSearchValue] = useState("");
   const [suggestions, setSuggestions] = useState([]);
-  const [focused, setFocused] = useState(false);
-  const ref = useClickOutside(() => {
-    setFocused(false);
-  });
+  const location = useLocation();
 
   const onChange = (event) => {
-    setSearchValue(event.currentTarget.value);
-    if (!focused) setFocused(true);
-  };
-
-  const onSelectOption = (suggestion) => {
-    setSuggestions([]);
-    onSelect(suggestion);
-    setSearchValue(suggestion.name);
-    setFocused(false);
-  };
-
-  const onFocus = () => {
-    setFocused(true);
+    const newValue = event.currentTarget.value;
+    setSearchValue(newValue);
+    history.replaceState({ searchText: newValue }, "", location.href);
   };
 
   useEffect(() => {
-    if (focused && breeds && breeds?.length > 0) {
-      const fuse = new Fuse(breeds, fuseOptions);
-      let results = fuse.search(searchValue);
-      setSuggestions(results.filter(({ score }) => score < 0.3));
+    if (breeds && breeds.length > 0) {
+      if (searchValue.length > 0) {
+        const fuse = new Fuse(breeds, fuseOptions);
+        let results = fuse.search(searchValue);
+        setSuggestions(results.filter(({ score }) => score < 0.3));
+      } else {
+        let randomOrder = breeds
+          .sort(() => Math.random())
+          .map((item) => ({ item }));
+        setSuggestions(randomOrder);
+      }
     }
-  }, [focused, breeds, searchValue]);
+  }, [breeds, searchValue]);
+
+  useEffect(() => {
+    const { searchText } = location.state ?? {};
+    setSearchValue(searchText ?? "");
+  }, [location]);
 
   return (
     <Box
@@ -57,64 +57,39 @@ export function SearchBar({ onSelect, selected }) {
       {!loadingBreeds && (
         <>
           <Input
-            onFocus={onFocus}
             icon={<BsSearchHeart />}
             value={searchValue}
             onChange={onChange}
           />
-          {focused && (
-            <Box
-              ref={ref}
-              sx={{
-                position: "absolute",
-                top: "100%",
-                left: 0,
-                width: "100%",
-                background: "red",
-                "&:empty": {
-                  display: "none",
-                },
-              }}
-            >
-              {suggestions.map(({ item: suggestion }, index) => (
-                <SearchOption
-                  key={suggestion.id}
-                  index={index}
-                  onSelect={() => onSelectOption(suggestion)}
-                >
-                  {suggestion.name}
-                </SearchOption>
-              ))}
-            </Box>
-          )}
+
+          <Portal target={searchResultsContainerRef.current}>
+            {suggestions.map(({ item: suggestion }, index) => (
+              <SearchOption
+                key={suggestion.id}
+                index={index}
+                breed={suggestion}
+              />
+            ))}
+          </Portal>
         </>
       )}
     </Box>
   );
 }
 
-function SearchOption({ children, index, onSelect, ...props }) {
-  const onKeyDown = ({ key }) => {
-    switch (key) {
-      case "Enter":
-        onSelect();
-        break;
-      default:
-        break;
-    }
-  };
+function SearchOption({ breed, index, ...props }) {
   return (
     <Box
+      component="a"
       {...props}
+      href={`/breed/${breed.id}`}
       tabIndex={0}
-      onClick={onSelect}
-      onKeyDown={onKeyDown}
       sx={{
         display: "flex",
         padding: rem(8),
       }}
     >
-      {children}
+      {breed.name}
     </Box>
   );
 }
