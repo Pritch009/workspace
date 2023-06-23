@@ -81,7 +81,7 @@ export function SearchBar() {
             icon={<BsSearchHeart />}
             value={searchValue}
             onChange={onChange}
-            placeholder="Search by breed"
+            placeholder="Search by Breed"
           />
           <Group position='apart' spacing='md'>
             <OriginSelect />
