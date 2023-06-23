@@ -1,7 +1,8 @@
-import { Box, Button, Modal, Select, Text, rem } from "@mantine/core";
+import { Box, Button, Flex, Grid, Modal, Select, Space, Stack, Text, Title, rem } from "@mantine/core";
 import { BsFilter } from 'react-icons/bs';
 import { useFilter } from "../contexts/filterContext";
 import { useMemo, useState } from "react";
+import { MdClose } from "react-icons/md";
 
 
 const FilterOptions = [
@@ -30,7 +31,7 @@ const FilterOptions = [
         ]
     },
     {
-        label: 'Short Legs',
+        label: 'Leg Size',
         field: 'short_legs',
         options: [
             { label: 'Short Legs', value: 1 },
@@ -70,6 +71,7 @@ const FilterOptions = [
 
 export function FilterModal() {
     const [open, setOpen] = useState(false);
+    const [filterState, setFilterState] = useFilter();
 
     const openFilter = () => {
         setOpen(true);
@@ -79,16 +81,43 @@ export function FilterModal() {
         setOpen(false);
     }
 
+    const clearFilter = () => {
+        setFilterState({});
+        closeFilter();
+    }
+
+    const count = useMemo(() => {
+        const numKeys = Object.keys(filterState).filter((field) => field.localeCompare('country_code') !== 0).length;
+        if (numKeys === 0) {
+            return null;
+        }
+        return <>{numKeys}</>;
+    }, [filterState]);
+
     return <>
-        <Button leftIcon={<BsFilter />} onClick={openFilter}>Filter</Button>
-        <Modal opened={open} onClose={closeFilter} title='Filter Breeds' centered styles={{ inner: { boxSizing: 'border-box' } }}>
-            <Box sx={{ display: 'grid', gap: rem(16) }}>
-                {
-                    FilterOptions.map(({ label, field, options }) => {
-                        return <FilterOptionSelect key={label} field={field} label={label} options={options} />
-                    })
-                }
-            </Box>
+        <Flex gap={rem(8)} sx={{ flex: '1 1 auto' }} align='center' justify='end'>
+            {count && <Button variant='subtle' leftIcon={<MdClose />} onClick={clearFilter}>Clear</Button>}
+            <Button leftIcon={<BsFilter />} onClick={openFilter} rightIcon={count}>Filter</Button>
+        </Flex>
+        <Modal opened={open} onClose={closeFilter} title={<Title order={4}>Filter Breeds</Title>} centered styles={{ inner: { boxSizing: 'border-box' } }} sx={{ flexBasis: '1000px' }}>
+            <Stack spacing='lg'>
+                <Text size='sm'>
+                    Select the options you want to filter by. If you select multiple options for a single filter, it will only show breeds that match all of the selected options.
+                </Text>
+                <Grid gutter="md">
+                    {
+                        FilterOptions.map(({ label, field, options }) => {
+                            return <Grid.Col key={label} span={12} xs={6}>
+                                <FilterOptionSelect field={field} label={label} options={options} />
+                            </Grid.Col>
+                        })
+                    }
+                </Grid>
+                <Space h={rem(16)} />
+                <Stack align='end'>
+                    <Button onClick={closeFilter}>Close</Button>
+                </Stack>
+            </Stack>
         </Modal>
     </>
 }
@@ -112,8 +141,8 @@ const FilterOptionSelect = ({ field, label, options }) => {
         })
     }
 
-    return <Box>
-        <Text>{label}</Text>
+    return <Stack spacing='none'>
+        <Text size='xs' transform="uppercase">{label}</Text>
         <Box
             sx={{
                 display: 'flex',
@@ -123,13 +152,15 @@ const FilterOptionSelect = ({ field, label, options }) => {
         >
             {
                 options.map(({ label, value }) => (
-                    (currentValue === undefined || currentValue === value) && <Button
+                    <Button
                         key={label}
                         variant={currentValue === value ? 'filled' : "outline"}
                         onClick={() => onSelect(value)}
+                        sx={{ transition: '0.15s' }}
+                        disabled={!(currentValue === undefined || currentValue === value)}
                     >{label}</Button>
                 ))
             }
         </Box>
-    </Box >
+    </Stack >
 }

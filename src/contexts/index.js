@@ -1,8 +1,20 @@
 import { Outlet } from "react-router-dom";
 import { FilterContext } from "./filterContext";
+import { Footer, MantineProvider, Stack, Text, rem } from "@mantine/core";
+import { theme } from "./mantineTheme";
 
 export function ContextsWrapper({ children }) {
-    return <FilterContext>
-        {children}
-    </FilterContext>
+    return <MantineProvider
+        withNormalizeCSS
+        theme={theme}
+    >
+        <FilterContext>
+            {children}
+            <Footer>
+                <Stack align="center" p={rem(8)}>
+                    <Text size='sm'>2023 | William Pritchard</Text>
+                </Stack>
+            </Footer>
+        </FilterContext>
+    </MantineProvider>
 }

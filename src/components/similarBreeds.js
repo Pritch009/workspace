@@ -1,5 +1,5 @@
 import { Title, Box, Card, Text, rem, Container, Group } from "@mantine/core";
-import { useBreedImageUrl, useBreeds } from "../APIs/cats";
+import { useBreeds } from "../APIs/cats";
 import similarity from "compute-cosine-similarity";
 import { useMemo } from "react";
 import { pick } from "../utilities";

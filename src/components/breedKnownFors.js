@@ -6,7 +6,7 @@ import { FaDog, FaCat } from "react-icons/fa";
 import { RiKakaoTalkFill } from "react-icons/ri";
 import { IoPeople } from "react-icons/io5";
 import { GiHairStrands, GiComb, GiHealthNormal, GiBrain } from "react-icons/gi";
-import { Box, rem, Card, Text } from "@mantine/core";
+import { Box, rem, Card, Text, useMantineColorScheme, useMantineTheme } from "@mantine/core";
 
 const attributes = {
     adaptability: {
@@ -102,6 +102,7 @@ const attributes = {
 };
 
 export function BreedKnownFors({ breed }) {
+    const theme = useMantineTheme();
     const values = useMemo(() => {
         const values = Object.entries(breed).filter(
             ([key, value]) => key in attributes
@@ -125,14 +126,14 @@ export function BreedKnownFors({ breed }) {
             const display = attr.display[sortKey];
             let bg;
             if (attr.ambiguous) {
-                bg = '#6060ff';
+                bg = 'blue';
             } else {
                 switch (sortKey) {
                     case 'high':
-                        bg = '#60ff60';
+                        bg = 'green';
                         break;
                     case 'low':
-                        bg = '#ff6060';
+                        bg = 'orange';
                         break;
                 }
             }
@@ -141,13 +142,13 @@ export function BreedKnownFors({ breed }) {
 
             const element = display && (
                 <Card
-                    bg={bg}
                     py={rem(8)}
                     sx={{
                         display: "flex",
                         alignItems: "center",
                         gap: rem(8),
                         flex: '0 0 auto',
+                        backgroundColor: theme.colors[bg][3]
                     }}
                 >
                     <Icon fontSize="1.15rem" />

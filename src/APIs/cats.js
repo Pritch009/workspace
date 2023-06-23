@@ -59,8 +59,8 @@ export function useBreed(breedId) {
       (breed) => breed.id.localeCompare(breedId) === 0
     );
 
-    console.log(`Could not find ${breedId} in breeds: ${breeds.data.map(({ id }) => id)}`)
     if (!breed) {
+      console.log(`Could not find ${breedId} in breeds: ${breeds.data.map(({ id }) => id)}`)
       return { error: `Unknown breed: ${breedId}` };
     }
 
@@ -70,16 +70,16 @@ export function useBreed(breedId) {
   }
 }
 
-export function useBreedImageUrl(breedId) {
-  const [{ data }] = useAxios(
+export function useBreedImageUrl(breedId, limit = 1) {
+  const [{ data, error }] = useAxios(
     {
-      url: `https://api.thecatapi.com/v1/images/search?breed_ids=${breedId}`,
+      url: `https://api.thecatapi.com/v1/images/search?limit=${limit}&breed_ids=${breedId}`,
       method: "GET",
     },
     { manual: false }
   );
 
-  return data?.[0]?.url;
+  return data ?? [];
 }
 
 export default cats;

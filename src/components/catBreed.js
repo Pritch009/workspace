@@ -1,4 +1,4 @@
-import { useMemo, Fragment, forwardRef } from "react";
+import { useMemo, Fragment, forwardRef, useEffect } from "react";
 import {
   Box,
   Title,
@@ -12,6 +12,7 @@ import {
   Badge,
   ActionIcon,
   Container,
+  Stack,
 } from "@mantine/core";
 import { useBreedImageUrl, useBreed } from "../APIs/cats";
 import { BsWikipedia, BsFillHeartFill } from "react-icons/bs";
@@ -28,13 +29,25 @@ import VcaLogo from '../assets/vca-logo.png';
 import VetstreetLogo from '../assets/vetstreet-logo-colored.webp';
 import { useViewportSize } from "@mantine/hooks";
 import { SimilarBreeds } from "./similarBreeds";
+import { EmptyBreedImage } from "./emptyBreedImage";
+import { Carousel } from "@mantine/carousel";
+import { NationalFlag } from "./nationalFlag";
 
 export function CatBreed() {
   const { breedId } = useParams();
   const { breed, error } = useBreed(breedId);
-  const imageUrl = useBreedImageUrl(breedId);
+  const images = useBreedImageUrl(breedId, 5).slice(0, 5);
   const navigate = useNavigate();
   const { width: screenWidth } = useViewportSize();
+
+  useEffect(() => {
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    }, 50);
+  }, [breed]);
 
   const goBack = () => {
     navigate('/');
@@ -155,15 +168,62 @@ export function CatBreed() {
       }}
     >
       <Card.Section>
-        <Box sx={{
+        <Stack align="center" justify="center" sx={{
           position: 'relative',
           width: '100%',
           height: 'auto',
           aspectRatio: '1 / 1',
         }}>
-          {imageUrl && (
+          {
+            images.length > 1 && (
+              <Carousel
+                loop
+                withIndicators
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                }}
+                styles={{
+                  viewport: {
+                    height: '100%',
+                    width: '100%',
+                  },
+                  container: {
+                    height: '100%',
+                    width: '100%',
+                  }
+                }}
+              >
+                {images.map((image, index) => (
+                  <Carousel.Slide
+                    onClick={() => { }}
+                    key={image.url}
+                    sx={{
+                      display: 'block',
+                      height: '100%',
+                      width: '100%',
+                      position: 'relative',
+                    }}
+                  >
+                    <img
+                      src={image.url}
+                      alt={`Image of ${breed?.name} cat.`}
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                      style={{
+                        objectFit: "cover",
+                        height: '100%',
+                        width: '100%',
+                        position: 'absolute'
+                      }}
+                    />
+                  </Carousel.Slide>
+                ))}
+              </Carousel>
+            )
+          }
+          {/* {images.length > 0 && (
             <img
-              src={imageUrl}
+              src={images[0].url}
               alt={`Image of ${breed?.name} cat.`}
               style={{
                 objectFit: "cover",
@@ -172,8 +232,13 @@ export function CatBreed() {
                 position: 'absolute',
               }}
             />
-          )}
-        </Box>
+          )} */}
+          {
+            images.length === 0 && (
+              <EmptyBreedImage />
+            )
+          }
+        </Stack>
       </Card.Section>
     </Card>
   );
@@ -293,177 +358,3 @@ function IconLink({ Icon, href, label }) {
     </Tooltip>
   );
 }
-
-const NationalFlag = forwardRef(
-  function NationalFlag({ countryCode, sx, ...props }, ref) {
-    // given a country code, return the flag as an unicode emoji
-    const flag = useMemo(() => {
-      switch (countryCode) {
-        case 'AU':
-          return '🇦🇺';
-        case 'CA':
-          return '🇨🇦';
-        case 'CN':
-          return '🇨🇳';
-        case 'DK':
-          return '🇩🇰';
-        case 'FR':
-          return '🇫🇷';
-        case 'DE':
-          return '🇩🇪';
-        case 'IT':
-          return '🇮🇹';
-        case 'JP':
-          return '🇯🇵';
-        case 'KR':
-          return '🇰🇷';
-        case 'NL':
-          return '🇳🇱';
-        case 'NZ':
-          return '🇳🇿';
-        case 'NO':
-          return '🇳🇴';
-        case 'ES':
-          return '🇪🇸';
-        case 'SE':
-          return '🇸🇪';
-        case 'TR':
-          return '🇹🇷';
-        case 'GB':
-          return '🇬🇧';
-        case 'US':
-          return '🇺🇸';
-        case 'EG':
-          return '🇪🇬';
-        case 'RU':
-          return '🇷🇺';
-        case 'TH':
-          return '🇹🇭';
-        case 'CH':
-          return '🇨🇭';
-        case 'AT':
-
-          return '🇦🇹';
-        case 'BG':
-          return '🇧🇬';
-        case 'HR':
-          return '🇭🇷';
-        case 'CZ':
-          return '🇨🇿';
-        case 'FI':
-          return '🇫🇮';
-        case 'GR':
-          return '🇬🇷';
-
-        case 'HU':
-          return '🇭🇺';
-        case 'ID':
-          return '🇮🇩';
-        case 'IE':
-          return '🇮🇪';
-        case 'IL':
-          return '🇮🇱';
-        case 'IN':
-          return '🇮🇳';
-        case 'MY':
-          return '🇲🇾';
-        case 'PL':
-          return '🇵🇱';
-        case 'PT':
-          return '🇵🇹';
-        case 'RO':
-          return '🇷🇴';
-        case 'RS':
-          return '🇷🇸';
-        case 'SG':
-          return '🇸🇬';
-        case 'SI':
-          return '🇸🇮';
-        case 'SK':
-          return '🇸🇰';
-        case 'UA':
-          return '🇺🇦';
-        case 'ZA':
-
-          return '🇿🇦';
-        case 'VN':
-          return '🇻🇳';
-        case 'BH':
-          return '🇧🇭';
-        case 'CY':
-          return '🇨🇾';
-        case 'EE':
-          return '🇪🇪';
-        case 'HK':
-          return '🇭🇰';
-        case 'IS':
-          return '🇮🇸';
-        case 'JO':
-          return '🇯🇴';
-        case 'KW':
-          return '🇰🇼';
-
-        case 'LB':
-          return '🇱🇧';
-        case 'LU':
-          return '🇱🇺';
-        case 'MT':
-          return '🇲🇹';
-        case 'MX':
-          return '🇲🇽';
-        case 'MC':
-          return '🇲🇨';
-        case 'OM':
-          return '🇴🇲';
-        case 'PH':
-          return '🇵🇭';
-        case 'PR':
-          return '🇵🇷';
-        case 'QA':
-          return '🇶🇦';
-        case 'SA':
-          return '🇸🇦';
-        case 'AE':
-          return '🇦🇪';
-        case 'UY':
-          return '🇺🇾';
-        case 'VE':
-          return '🇻🇪';
-        case 'AD':
-          return '🇦🇩';
-        case 'AG':
-          return '🇦🇬';
-        case 'AI':
-          return '🇦🇮';
-        case 'AL':
-          return '🇦🇱';
-        case 'AM':
-          return '🇦🇲';
-        case 'AO':
-          return '🇦🇴';
-        case 'AQ':
-          return '🇦🇶';
-        case 'AR':
-          return '🇦🇷';
-        case 'AW':
-          return '🇦🇼';
-        case 'AZ':
-          return '🇦🇿';
-        case 'BB':
-          return '🇧🇧';
-        case 'BD':
-          return '🇧🇩';
-        case 'BE':
-          return '🇧🇪';
-        case 'BF':
-          return '🇧🇫';
-
-        default:
-          return countryCode;
-      }
-    }, [countryCode]);
-    return <Text ref={ref} {...props} sx={[sx, {
-      fontSize: rem(24), lineHeight: 'normal'
-    }]}>{flag}</Text>
-  }
-);

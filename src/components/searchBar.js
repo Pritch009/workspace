@@ -1,20 +1,23 @@
 import { useEffect, useState, useMemo } from "react";
 import { BsSearchHeart } from "react-icons/bs";
-import { Box, Input, rem, Title, Text, Alert, Portal, Stack, Grid } from "@mantine/core";
+import { Box, Input, rem, Title, Text, Alert, Portal, Stack, Grid, Group } from "@mantine/core";
 import { useBreeds } from "../APIs/cats";
 import Fuse from "fuse.js";
 import { useClickOutside } from "@mantine/hooks";
 import { Link, useLocation } from "react-router-dom";
 import { useFilter } from "../contexts/filterContext";
 import { BreedLinkCard } from "./breedLinkCard";
+import { FilterModal } from "./filterModal";
+import { OriginSelect } from "./originSelect";
+import { EmptyBreedImage } from "./emptyBreedImage";
 
 const fuseOptions = {
   includeScore: true,
   shouldSort: true,
-  keys: ["name", "origin", "description"],
+  keys: ["name", "description"],
 };
 
-export function SearchBar({ }) {
+export function SearchBar() {
   const { data: breeds, loading: loadingBreeds, error } = useBreeds();
   const [err, setErr] = useState(null);
   const [searchValue, setSearchValue] = useState("");
@@ -63,13 +66,13 @@ export function SearchBar({ }) {
   }, [breeds, searchValue, fuseFilter, filter]);
 
   return (
-    <Box
+    <Stack
       sx={{
         position: "relative",
         width: "100%",
       }}
     >
-      {error && <Alert title="Error!">{error.response.statusText}</Alert>}
+      {error && <Alert title="Error!">{error?.response?.statusText ?? "Unknown error occurred, unable to reach the Cat API!"}</Alert>}
       {err && <Alert title="Error!">{JSON.stringify(err)}</Alert>}
       {loadingBreeds && <div>Loading</div>}
       {!loadingBreeds && (
@@ -78,28 +81,55 @@ export function SearchBar({ }) {
             icon={<BsSearchHeart />}
             value={searchValue}
             onChange={onChange}
+            placeholder="Search by breed"
           />
-
-          <Grid grow gutter='lg' py='lg'>
-            {suggestions.map(({ item: suggestion }, index) => (
-              <Grid.Col
-                key={suggestion.id}
-                span={6}
-                xs={4}
-                sm={3}
-                miw={200}
+          <Group position='apart' spacing='md'>
+            <OriginSelect />
+            <FilterModal />
+          </Group>
+          {
+            suggestions.length > 0 && (
+              <Grid grow gutter='lg' pb='lg'>
+                {suggestions.map(({ item: suggestion }, index) => (
+                  <Grid.Col
+                    key={suggestion.id}
+                    span={6}
+                    xs={4}
+                    sm={3}
+                    miw={200}
+                  >
+                    <SearchOption
+                      index={index}
+                      breed={suggestion}
+                    />
+                  </Grid.Col>
+                ))}
+              </Grid>
+            )
+          }
+          {
+            suggestions.length === 0 && (
+              <Stack
+                w='100%'
+                p={rem(32)}
+                align='center'
+                justify="center"
               >
-                <SearchOption
-                  index={index}
-                  breed={suggestion}
-                />
-              </Grid.Col>
-            ))}
-          </Grid>
+                <Box sx={{
+                  height: 200,
+                  width: 200,
+                }}>
+                  <EmptyBreedImage />
+                </Box>
+                <Text size='sm'>
+                  No results found
+                </Text>
+              </Stack>
+            )
+          }
         </>
-      )
-      }
-    </Box >
+      )}
+    </Stack>
   );
 }
 

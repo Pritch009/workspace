@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { Box, Group, rem, Title } from "@mantine/core";
+import { Box, Flex, Group, rem, Title } from "@mantine/core";
 import { SearchBar } from "./searchBar";
 import { useLocation } from "react-router-dom";
 import { FilterModal } from "./filterModal";
@@ -44,10 +44,9 @@ export function MainFunctional() {
         padding: rem(16),
       }}
     >
-      <Group position="apart">
-        <Title>Search Cats!</Title>
-        <FilterModal />
-      </Group>
+      <Flex justify='space-between' wrap='wrap' gap={rem(16)}>
+        <Title sx={{ flex: '0 0 auto' }}>Search Cats!</Title>
+      </Flex>
       <SearchBar />
     </Box >
   );
