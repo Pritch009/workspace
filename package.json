@@ -11,6 +11,7 @@
     "@mantine/hooks": "6.0.5",
     "axios": "0.18.0",
     "axios-hooks": "4.0.0",
+    "compute-cosine-similarity": "^1.0.0",
     "fuse.js": "6.6.2",
     "react": "17.0.1",
     "react-dom": "17.0.1",
@@ -36,5 +37,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "resolutions": {
+    "react-error-overlay": "6.0.9"
   }
 }

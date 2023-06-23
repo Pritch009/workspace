@@ -1,11 +1,12 @@
 import { useEffect, useState, useMemo } from "react";
 import { BsSearchHeart } from "react-icons/bs";
-import { Box, Input, rem, Title, Text, Alert, Portal } from "@mantine/core";
+import { Box, Input, rem, Title, Text, Alert, Portal, Stack, Grid } from "@mantine/core";
 import { useBreeds } from "../APIs/cats";
 import Fuse from "fuse.js";
 import { useClickOutside } from "@mantine/hooks";
 import { Link, useLocation } from "react-router-dom";
 import { useFilter } from "../contexts/filterContext";
+import { BreedLinkCard } from "./breedLinkCard";
 
 const fuseOptions = {
   includeScore: true,
@@ -79,20 +80,22 @@ export function SearchBar({ }) {
             onChange={onChange}
           />
 
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr'
-            }}
-          >
+          <Grid grow gutter='lg' py='lg'>
             {suggestions.map(({ item: suggestion }, index) => (
-              <SearchOption
+              <Grid.Col
                 key={suggestion.id}
-                index={index}
-                breed={suggestion}
-              />
+                span={6}
+                xs={4}
+                sm={3}
+                miw={200}
+              >
+                <SearchOption
+                  index={index}
+                  breed={suggestion}
+                />
+              </Grid.Col>
             ))}
-          </Box>
+          </Grid>
         </>
       )
       }
@@ -101,18 +104,21 @@ export function SearchBar({ }) {
 }
 
 function SearchOption({ breed, index, ...props }) {
-  return (
-    <Box
-      component={Link}
-      {...props}
-      to={`/breed/${breed.id}`}
-      tabIndex={0}
-      sx={{
-        display: "flex",
-        padding: rem(8),
-      }}
-    >
-      {breed.name}
-    </Box>
-  );
+  return <Stack align='center' sx={{ aspectRatio: '1/1' }}>
+    <BreedLinkCard breed={breed} />
+  </Stack >
+  // return (
+  //   <Box
+  //     component={Link}
+  //     {...props}
+  //     to={`/breed/${breed.id}`}
+  //     tabIndex={0}
+  //     sx={{
+  //       display: "flex",
+  //       padding: rem(8),
+  //     }}
+  //   >
+  //     {breed.name}
+  //   </Box>
+  // );
 }

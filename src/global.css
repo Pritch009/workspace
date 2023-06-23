@@ -1,3 +1,8 @@
 html {
     background: #00000010;
 }
+
+body {
+    padding: 0;
+    margin: 0;
+}

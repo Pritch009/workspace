@@ -40,7 +40,8 @@ export function MainFunctional() {
         flexDirection: "column",
         gap: rem(16),
         maxWidth: rem(1000),
-        margin: 'auto'
+        margin: 'auto',
+        padding: rem(16),
       }}
     >
       <Group position="apart">

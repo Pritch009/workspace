@@ -27,6 +27,7 @@ import CfaLogo from '../assets/cfa-logo.png';
 import VcaLogo from '../assets/vca-logo.png';
 import VetstreetLogo from '../assets/vetstreet-logo-colored.webp';
 import { useViewportSize } from "@mantine/hooks";
+import { SimilarBreeds } from "./similarBreeds";
 
 export function CatBreed() {
   const { breedId } = useParams();
@@ -40,7 +41,7 @@ export function CatBreed() {
   };
 
   const learnMoreLinks = (
-    breed && <Box sx={{ display: 'flex', alignItems: 'center', gap: rem(16), justifyContent: 'center', overflow: 'visible' }}>
+    breed && <Box sx={{ display: 'flex', alignItems: 'center', gap: rem(16), justifyContent: 'center', overflow: 'visible', flexWrap: 'wrap' }}>
       {breed?.wikipedia_url && <IconLink Icon={BsWikipedia} href={breed.wikipedia_url} label="Learn more on Wikipedia" />}
       {breed?.vetstreet_url && <IconLink Icon={() => <LinkLogo src={VetstreetLogo} alt="Vetstreet" />} href={breed.vetstreet_url} label="Learn more on Vetstreet" />}
       {breed?.vcahospitals_url && <IconLink Icon={() => <LinkLogo src={VcaLogo} alt="VCA Hospitals logo" />} href={breed.vcahospitals_url} label="Learn more on VCA Hospitals" />}
@@ -81,36 +82,36 @@ export function CatBreed() {
   )
 
   const description = (
-    <Card bg='green' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
+    <Card shadow="md" radius='lg' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
       {
         breed?.description && <Box>
           <Text size='xs' transform='uppercase'>Description</Text>
-          <Text size='md' italic weight='normal' transform="capitalize">{breed?.description}</Text>
+          <Text size='md' weight='normal' transform="capitalize">{breed?.description}</Text>
         </Box>
       }
     </Card>
   );
 
   const alsoKnownAs = (
-    breed?.alt_names && <Card bg='green' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
+    breed?.alt_names && <Card radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Also known as</Text>
-        <Text size='md' italic weight='normal' transform="capitalize">{breed?.alt_names}</Text>
+        <Text size='md' weight='normal' transform="capitalize">{breed?.alt_names}</Text>
       </Box>
     </Card>
   );
 
   const temperament = (
-    breed?.temperament && <Card bg='green' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
+    breed?.temperament && <Card radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Temperament</Text>
-        <Text size='md' italic weight='normal'>{breed?.temperament}</Text>
+        <Text size='md' weight='normal'>{breed?.temperament}</Text>
       </Box>
     </Card>
   )
 
   const lifeSpan = (
-    breed?.life_span && <Card bg='green' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
+    breed?.life_span && <Card radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Life Span</Text>
         <Text size='md' italic weight='normal'>{breed?.life_span} years</Text>
@@ -119,7 +120,7 @@ export function CatBreed() {
   )
 
   const weightInStandard = (
-    breed?.weight && <Card bg='green' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
+    breed?.weight && <Card radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Weight</Text>
         <Text size='md' italic weight='normal'>{breed?.weight.imperial} lbs</Text>
@@ -127,7 +128,7 @@ export function CatBreed() {
     </Card>
   );
   const badges = (
-    breed && <Box sx={{ display: 'flex', flexWrap: 'wrap', width: '100%', gap: rem(8), marginTop: rem(12) }}>
+    breed && <Box py={rem(16)} sx={{ display: 'flex', flexWrap: 'wrap', width: '100%', gap: rem(8), justifyContent: 'center' }}>
       <Badge variant="outline" color='gray' size="lg" leftSection={<NationalFlag countryCode={breed?.country_code} />}>
         {breed?.origin}
       </Badge>
@@ -146,6 +147,8 @@ export function CatBreed() {
 
   const image = (
     breed && <Card
+      radius='lg'
+      shadow="md"
       sx={{
         width: '100%',
         alignItems: 'start',
@@ -156,7 +159,7 @@ export function CatBreed() {
           position: 'relative',
           width: '100%',
           height: 'auto',
-          aspectRatio: '4/3',
+          aspectRatio: '1 / 1',
         }}>
           {imageUrl && (
             <img
@@ -172,12 +175,12 @@ export function CatBreed() {
           )}
         </Box>
       </Card.Section>
-      {badges}
     </Card>
   );
 
   const title = (
     breed && <Box
+      py={rem(16)}
       sx={{
         display: 'grid',
         alignItems: 'center',
@@ -191,7 +194,7 @@ export function CatBreed() {
       <Box sx={{}}>
         {backButton}
       </Box>
-      <Title sx={{ fontSize: 'clamp(1rem, 10vw, 2rem)' }}>{breed?.name}</Title>
+      <Title sx={{ fontSize: 'clamp(1rem, 7vw, 1.67rem)', textAlign: 'center' }}>{breed?.name}</Title>
       <Box />
     </Box>
   );
@@ -200,38 +203,57 @@ export function CatBreed() {
     <>
       <Box
         sx={{
-          width: "100%",
+          maxWidth: "100%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          maxWidth: rem(1000),
+          width: rem(1000),
           margin: 'auto',
-          paddingBottom: rem(48)
+          paddingBottom: rem(48),
+          overflow: 'hidden',
         }}
       >
         {error && <Alert title="Failed to load breed!">{error}</Alert>}
         {breed && (
-          <Grid>
+          <Grid sx={{ width: '100%' }}>
             <Grid.Col span={12}>
               {title}
             </Grid.Col>
-            <Grid.Col xs={12} sm={6} md={4} xl={3} sx={{ display: 'flex', flexDirection: "column", alignItems: 'start', gap: rem(16) }}>
-              {image}
-              {description}
-            </Grid.Col>
-            <Grid.Col xs={12} sm='auto' sx={{ display: 'flex', flexDirection: "column", gap: rem(16) }}>
+            <Grid.Col xs={12} sx={{ display: 'flex', flexDirection: "column", alignItems: 'start', gap: rem(16) }}>
               <Grid>
-                <Grid.Col span={6}>
-                  {lifeSpan}
+                <Grid.Col xs={12} sm={6} md={4} xl={3} sx={{ display: 'flex', flexDirection: "column", alignItems: 'start' }}>
+                  <Grid gutter='none' grow sx={{ width: '100%', margin: '0 auto' }}>
+                    <Grid.Col span={12}>
+                      {image}
+                      {badges}
+                    </Grid.Col>
+                    <Grid.Col>
+                      <Grid grow>
+                        <Grid.Col span={6}>
+                          {lifeSpan}
+                        </Grid.Col>
+                        <Grid.Col span={6}>
+                          {weightInStandard}
+                        </Grid.Col>
+                      </Grid>
+                    </Grid.Col>
+                  </Grid>
                 </Grid.Col>
-                <Grid.Col span={6}>
-                  {weightInStandard}
+                <Grid.Col xs={12} sm='auto' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
+                  {alsoKnownAs}
+                  {description}
+                  {temperament}
+                  {knownFor}
+                  {learnMoreLinks}
                 </Grid.Col>
               </Grid>
-              {alsoKnownAs}
-              {temperament}
-              {knownFor}
-              {learnMoreLinks}
+            </Grid.Col>
+            <Grid.Col xs={12}>
+              <Grid sx={{ maxWidth: '100% !important', overflow: 'hidden', margin: 0 }}>
+                <Grid.Col span={12} maw='100%'>
+                  <SimilarBreeds to={breed} />
+                </Grid.Col>
+              </Grid>
             </Grid.Col>
           </Grid>
         )}
