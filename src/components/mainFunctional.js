@@ -37,7 +37,12 @@ export function MainFunctional() {
       className="App"
       py={rem(16)}
       display="flex"
-      style={{ flexDirection: "column", gap: rem(16) }}
+      style={{
+        flexDirection: "column",
+        gap: rem(16),
+        maxWidth: rem(1000),
+        margin: 'auto'
+      }}
     >
       <Title>Search Cats!</Title>
       <SearchBar

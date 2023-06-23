@@ -8,7 +8,7 @@ import { useLocation } from "react-router-dom";
 
 const fuseOptions = {
   includeScore: true,
-  keys: ["name", "origin"],
+  keys: ["name", "origin", "description"],
 };
 
 export function SearchBar({ searchResultsContainerRef }) {
