@@ -84,7 +84,6 @@ export function SearchBar() {
             placeholder="Search by Breed"
           />
           <Group position='apart' spacing='md'>
-            <OriginSelect />
             <FilterModal />
           </Group>
           {

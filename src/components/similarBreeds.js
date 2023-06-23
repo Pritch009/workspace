@@ -7,7 +7,7 @@ import { BreedLinkCard } from "./breedLinkCard";
 
 const SimilarityFields = ["hairless", "adaptability", "affection_level", "child_friendly", "dog_friendly", "energy_level", "grooming", "health_issues", "intelligence", "shedding_level", "social_needs", "stranger_friendly", "vocalisation"];
 const BooleanFields = ["hairless", "rare", "suppressed_tail", "short_legs", "hypoallergenic", "experimental", "natural"];
-const BooleanFieldWeights = [10, 5, 10, 10, 5, 10, 1];
+const BooleanFieldWeights = [20, 5, 10, 20, 5, 10, 1];
 
 function extractComparisonVector(breed) {
     return [

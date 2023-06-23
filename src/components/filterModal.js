@@ -3,6 +3,7 @@ import { BsFilter } from 'react-icons/bs';
 import { useFilter } from "../contexts/filterContext";
 import { useMemo, useState } from "react";
 import { MdClose } from "react-icons/md";
+import { OriginSelect } from "./originSelect";
 
 
 const FilterOptions = [
@@ -104,6 +105,7 @@ export function FilterModal() {
                 <Text size='sm'>
                     Select the options you want to filter by. If you select multiple options for a single filter, it will only show breeds that match all of the selected options.
                 </Text>
+                <OriginSelect />
                 <Grid gutter="md">
                     {
                         FilterOptions.map(({ label, field, options }) => {
