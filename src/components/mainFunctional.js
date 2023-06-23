@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { Box, rem, Title } from "@mantine/core";
+import { Box, Group, rem, Title } from "@mantine/core";
 import { SearchBar } from "./searchBar";
-import { CatBreed } from "./catBreed";
 import { useLocation } from "react-router-dom";
-import { SearchResultsContainer } from "./searchResults";
+import { FilterModal } from "./filterModal";
 
 export function MainFunctional() {
   const [selected, setSelected] = useState(null);
@@ -44,11 +43,11 @@ export function MainFunctional() {
         margin: 'auto'
       }}
     >
-      <Title>Search Cats!</Title>
-      <SearchBar
-        searchResultsContainerRef={searchResultsContainerRef}
-      />
-      <SearchResultsContainer ref={searchResultsContainerRef} />
-    </Box>
+      <Group position="apart">
+        <Title>Search Cats!</Title>
+        <FilterModal />
+      </Group>
+      <SearchBar />
+    </Box >
   );
 }

@@ -2,22 +2,20 @@ import { BrowserRouter, Route, RouterProvider, Routes, createBrowserRouter, redi
 import { MainFunctional } from './components/mainFunctional'
 import { CatBreed } from './components/catBreed';
 import { useEffect } from 'react';
-
-const router = createBrowserRouter([
-    {
-        path: '/',
-        element: <MainFunctional />
-    }
-]);
+import { ContextsWrapper } from './contexts';
 
 export function Router() {
-    return <BrowserRouter>
-        <Routes path="/">
-            <Route path="/breed/:breedId" element={<CatBreed />} />
-            <Route index element={<MainFunctional />} />
-            <Route path="*" element={<Redirect to="/" />} />
-        </Routes>
-    </BrowserRouter>
+    return (
+        <ContextsWrapper>
+            <BrowserRouter>
+                <Routes path="/">
+                    <Route path="/breed/:breedId" element={<CatBreed />} />
+                    <Route index element={<MainFunctional />} />
+                    <Route path="*" element={<Redirect to="/" />} />
+                </Routes>
+            </BrowserRouter>
+        </ContextsWrapper>
+    )
 }
 
 function Redirect({ to }) {

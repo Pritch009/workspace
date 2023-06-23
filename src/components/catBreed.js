@@ -21,7 +21,7 @@ import { FaDog, FaCat, FaSmileBeam, FaLeaf, FaCouch } from "react-icons/fa";
 import { RiKakaoTalkFill } from "react-icons/ri";
 import { IoPeople } from "react-icons/io5";
 import { GiHairStrands, GiComb, GiHealthNormal, GiBrain } from "react-icons/gi";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { BreedKnownFors } from "./breedKnownFors";
 import CfaLogo from '../assets/cfa-logo.png';
 import VcaLogo from '../assets/vca-logo.png';
@@ -36,7 +36,7 @@ export function CatBreed() {
   const { width: screenWidth } = useViewportSize();
 
   const goBack = () => {
-    navigate(-1);
+    navigate('/');
   };
 
   const learnMoreLinks = (
@@ -257,9 +257,9 @@ function IconLink({ Icon, href, label }) {
     <Tooltip label={label}>
       <Button
         variant="outline"
-        component="a"
+        component={Link}
         radius={100}
-        href={href}
+        to={href}
         size='lg'
         bg='white'
         sx={{
