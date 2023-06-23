@@ -42,7 +42,7 @@ export function OriginSelect() {
 
     return <Select
         onChange={(value) => onSelect(value)}
-        placeholder="Filter By Country"
+        placeholder="Filter by Origin"
         value={currentSelection || null}
         data={options.map(([countryCode, origin]) => (
             {
