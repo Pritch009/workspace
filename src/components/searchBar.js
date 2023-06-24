@@ -88,15 +88,19 @@ export function SearchBar() {
           </Group>
           {
             suggestions.length > 0 && (
-              <Flex justify='space-evenly' gap='lg' pb='lg' wrap='wrap'>
+              <Flex justify='space-between' gap='lg' pb='lg' wrap='wrap'>
                 {suggestions.map(({ item: suggestion }, index) => (
                   <Box
                     key={suggestion.id}
                     sx={{
-                      flex: '0 0 auto',
-                      minWidth: rem(150),
-                      maxWidth: rem(200),
-                      width: '20vw'
+                      flex: '1 0 auto',
+                      minWidth: rem(170),
+                      maxWidth: rem(220),
+                      width: '20vw',
+                      aspectRatio: '1/1',
+                      '&:empty': {
+                        display: 'none',
+                      }
                     }}
                   >
                     <SearchOption
@@ -129,27 +133,12 @@ export function SearchBar() {
             )
           }
         </>
-      )}
-    </Stack>
+      )
+      }
+    </Stack >
   );
 }
 
 function SearchOption({ breed, index, ...props }) {
-  return <Stack align='left' sx={{ aspectRatio: '1/1' }}>
-    <BreedLinkCard breed={breed} />
-  </Stack >
-  // return (
-  //   <Box
-  //     component={Link}
-  //     {...props}
-  //     to={`/breed/${breed.id}`}
-  //     tabIndex={0}
-  //     sx={{
-  //       display: "flex",
-  //       padding: rem(8),
-  //     }}
-  //   >
-  //     {breed.name}
-  //   </Box>
-  // );
+  return <BreedLinkCard breed={breed} />
 }

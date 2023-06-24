@@ -6,3 +6,8 @@ export function pick(val, fields) {
         fields.map((field) => [field, val[field]])
     )
 }
+
+export function doNothing(event) {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+}

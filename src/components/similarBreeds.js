@@ -19,7 +19,7 @@ function extractComparisonVector(breed) {
 export function SimilarBreeds({ to }) {
     const breeds = useBreeds();
 
-    const top5 = useMemo(() => {
+    const topSimilar = useMemo(() => {
         if (!breeds.data) {
             return [];
         }
@@ -59,8 +59,8 @@ export function SimilarBreeds({ to }) {
                     }}
                 >
                     {
-                        top5.map(([_, breed]) => (
-                            <Box key={breed.id} sx={{ height: 200, width: 200 }}>
+                        topSimilar.map(([_, breed]) => (
+                            <Box key={breed.id} sx={{ height: 200, width: 200, '&:empty': { display: "none" } }}>
                                 <BreedLinkCard breed={breed} />
                             </Box>
                         ))
