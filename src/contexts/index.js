@@ -10,7 +10,7 @@ export function ContextsWrapper({ children }) {
     >
         <FilterContext>
             {children}
-            <Footer>
+            <Footer zIndex={5}>
                 <Stack align="center" p={rem(8)}>
                     <Text size='sm'>2023 | William Pritchard</Text>
                 </Stack>

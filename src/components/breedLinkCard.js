@@ -6,7 +6,7 @@ import { EmptyBreedImage } from "./emptyBreedImage";
 export function BreedLinkCard({ breed }) {
     const [image] = useBreedImageUrl(breed.id);
 
-    return <Card component={Link} to={`/breed/${breed.id}`} display='flex' shadow='sm' radius='md' w="100%" h='100%' >
+    return <Card component={Link} to={`/breed/${breed.id}`} display='flex' shadow='sm' radius='md' w="100%" h='100%' maw={350} mah={350} >
         <Card.Section sx={{
             height: 'min-content', display: 'flex', flex: '1 1 auto',
             height: '100%',

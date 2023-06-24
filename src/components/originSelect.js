@@ -1,4 +1,4 @@
-import { Select } from "@mantine/core";
+import { Button, Flex, Group, Select } from "@mantine/core";
 import { useBreeds } from "../APIs/cats";
 import { useMemo } from "react";
 import { useFilter } from "../contexts/filterContext";
@@ -35,20 +35,37 @@ export function OriginSelect() {
         }
     };
 
+    const clearSelection = () => {
+        setFilter((prev) => {
+            delete prev.country_code;
+            return {
+                ...prev
+            }
+        });
+    }
+
     console.log('options', options);
     console.log('breeds', breeds);
 
     console.log(Array.from(new Set(breeds.map(({ country_code }) => country_code))).sort().toString());
 
-    return <Select
-        onChange={(value) => onSelect(value)}
-        placeholder="Filter by Origin"
-        value={currentSelection || null}
-        data={options.map(([countryCode, origin]) => (
-            {
-                value: countryCode,
-                label: `${getNationalFlagChar(countryCode)} ${origin}`
-            }
-        ))}
-    />
+    return (
+        <Flex w="100%" gap='md'>
+            {'country_code' in filter && <Button sx={{ flex: '0 0 auto' }} variant='outline' onClick={clearSelection} />}
+            <Select
+                sx={{
+                    flex: '1 1 auto'
+                }}
+                onChange={(value) => onSelect(value)}
+                placeholder="Filter by Origin"
+                value={currentSelection || null}
+                data={options.map(([countryCode, origin]) => (
+                    {
+                        value: countryCode,
+                        label: `${getNationalFlagChar(countryCode)} ${origin}`
+                    }
+                ))}
+            />
+        </Flex>
+    );
 }

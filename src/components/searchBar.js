@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { BsSearchHeart } from "react-icons/bs";
-import { Box, Input, rem, Title, Text, Alert, Portal, Stack, Grid, Group } from "@mantine/core";
+import { Box, Input, rem, Title, Text, Alert, Portal, Stack, Grid, Group, Flex } from "@mantine/core";
 import { useBreeds } from "../APIs/cats";
 import Fuse from "fuse.js";
 import { useClickOutside } from "@mantine/hooks";
@@ -72,10 +72,10 @@ export function SearchBar() {
         width: "100%",
       }}
     >
-      {error && <Alert title="Error!">{error?.response?.statusText ?? "Unknown error occurred, unable to reach the Cat API!"}</Alert>}
-      {err && <Alert title="Error!">{JSON.stringify(err)}</Alert>}
+      {error && <Alert title="Error!" color='red'>{error?.response?.statusText ?? "Unknown error occurred, unable to reach the Cat API!"}</Alert>}
+      {err && <Alert title="Error!" color='red'>{JSON.stringify(err)}</Alert>}
       {loadingBreeds && <div>Loading</div>}
-      {!loadingBreeds && (
+      {!loadingBreeds && breeds && (
         <>
           <Input
             icon={<BsSearchHeart />}
@@ -88,22 +88,24 @@ export function SearchBar() {
           </Group>
           {
             suggestions.length > 0 && (
-              <Grid grow gutter='lg' pb='lg'>
+              <Flex justify='space-evenly' gap='lg' pb='lg' wrap='wrap'>
                 {suggestions.map(({ item: suggestion }, index) => (
-                  <Grid.Col
+                  <Box
                     key={suggestion.id}
-                    span={6}
-                    xs={4}
-                    sm={3}
-                    miw={200}
+                    sx={{
+                      flex: '0 0 auto',
+                      minWidth: rem(150),
+                      maxWidth: rem(200),
+                      width: '20vw'
+                    }}
                   >
                     <SearchOption
                       index={index}
                       breed={suggestion}
                     />
-                  </Grid.Col>
+                  </Box>
                 ))}
-              </Grid>
+              </Flex>
             )
           }
           {
@@ -133,7 +135,7 @@ export function SearchBar() {
 }
 
 function SearchOption({ breed, index, ...props }) {
-  return <Stack align='center' sx={{ aspectRatio: '1/1' }}>
+  return <Stack align='left' sx={{ aspectRatio: '1/1' }}>
     <BreedLinkCard breed={breed} />
   </Stack >
   // return (

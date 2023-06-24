@@ -100,7 +100,7 @@ export function FilterModal() {
             {count && <Button variant='subtle' leftIcon={<MdClose />} onClick={clearFilter}>Clear</Button>}
             <Button leftIcon={<BsFilter />} onClick={openFilter} rightIcon={count}>Filter</Button>
         </Flex>
-        <Modal opened={open} onClose={closeFilter} title={<Title order={4}>Filter Breeds</Title>} centered styles={{ inner: { boxSizing: 'border-box' } }} sx={{ flexBasis: '1000px' }}>
+        <Modal opened={open} onClose={closeFilter} title={<Title order={4}>Filter Breeds</Title>} centered styles={{ inner: { boxSizing: 'border-box', left: 0 } }} sx={{ flexBasis: '1000px' }}>
             <Stack spacing='lg'>
                 <Text size='sm'>
                     Select the options you want to filter by. If you select multiple options for a single filter, it will only show breeds that match all of the selected options.

@@ -39,9 +39,11 @@ export function MainFunctional() {
       style={{
         flexDirection: "column",
         gap: rem(16),
-        maxWidth: rem(1000),
+        width: rem(1000),
+        maxWidth: "100%",
         margin: 'auto',
         padding: rem(16),
+        boxSizing: 'border-box'
       }}
     >
       <Flex justify='space-between' wrap='wrap' gap={rem(16)}>
