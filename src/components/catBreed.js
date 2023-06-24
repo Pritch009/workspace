@@ -13,6 +13,7 @@ import {
   ActionIcon,
   Container,
   Stack,
+  Space,
 } from "@mantine/core";
 import { useBreedImageUrl, useBreed } from "../APIs/cats";
 import { BsWikipedia, BsFillHeartFill } from "react-icons/bs";
@@ -221,18 +222,6 @@ export function CatBreed() {
               </Carousel>
             )
           }
-          {/* {images.length > 0 && (
-            <img
-              src={images[0].url}
-              alt={`Image of ${breed?.name} cat.`}
-              style={{
-                objectFit: "cover",
-                height: '100%',
-                width: '100%',
-                position: 'absolute',
-              }}
-            />
-          )} */}
           {
             images.length === 0 && (
               <EmptyBreedImage />
@@ -309,6 +298,7 @@ export function CatBreed() {
                   {description}
                   {temperament}
                   {knownFor}
+                  <Space sx={{ flex: '1 1 auto' }} />
                   {learnMoreLinks}
                 </Grid.Col>
               </Grid>

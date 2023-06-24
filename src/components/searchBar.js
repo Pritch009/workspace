@@ -10,6 +10,7 @@ import { BreedLinkCard } from "./breedLinkCard";
 import { FilterModal } from "./filterModal";
 import { OriginSelect } from "./originSelect";
 import { EmptyBreedImage } from "./emptyBreedImage";
+import { HiddenModal } from "./hiddenModal";
 
 const fuseOptions = {
   includeScore: true,
@@ -84,11 +85,12 @@ export function SearchBar() {
             placeholder="Search by Breed"
           />
           <Group position='apart' spacing='md'>
+            <HiddenModal />
             <FilterModal />
           </Group>
           {
             suggestions.length > 0 && (
-              <Flex justify='space-between' gap='lg' pb='lg' wrap='wrap'>
+              <Flex justify='start' gap='lg' pb='lg' wrap='wrap'>
                 {suggestions.map(({ item: suggestion }, index) => (
                   <Box
                     key={suggestion.id}

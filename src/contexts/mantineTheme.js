@@ -5,6 +5,13 @@ export const theme = {
         orange: '#E8A779',
         blue: '#3fadff',
         white: '#ffffff',
+    },
+    components: {
+        Modal: {
+            styles: {
+                inner: { boxSizing: 'border-box', left: 0 }
+            }
+        }
     }
 }
 
