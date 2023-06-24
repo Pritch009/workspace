@@ -1,9 +1,11 @@
-import { Title, Box, Card, Text, rem, Container, Group } from "@mantine/core";
+import { Title, Box, Card, Text, rem, Container, Group, Flex } from "@mantine/core";
 import { useBreeds } from "../APIs/cats";
 import similarity from "compute-cosine-similarity";
 import { useMemo } from "react";
 import { pick } from "../utilities";
 import { BreedLinkCard } from "./breedLinkCard";
+import { useFilter } from "../contexts/filterContext";
+import { useHideContext } from "../contexts/hideContext";
 
 const SimilarityFields = ["hairless", "adaptability", "affection_level", "child_friendly", "dog_friendly", "energy_level", "grooming", "health_issues", "intelligence", "shedding_level", "social_needs", "stranger_friendly", "vocalisation"];
 const BooleanFields = ["hairless", "rare", "suppressed_tail", "short_legs", "hypoallergenic", "experimental", "natural"];
@@ -18,55 +20,55 @@ function extractComparisonVector(breed) {
 
 export function SimilarBreeds({ to }) {
     const breeds = useBreeds();
+    const [hidden] = useHideContext();
 
     const topSimilar = useMemo(() => {
-        if (!breeds.data) {
+        if (!to || !breeds.data) {
             return [];
         }
         const toVec = extractComparisonVector(to);
-        return breeds.data.map((breed) => {
-            if (breed.id === to.id) {
-                return [0, breed];
-            }
-            return [similarity(
-                extractComparisonVector(breed),
-                toVec
-            ), breed]
-        }).sort(([a], [b]) => b - a).slice(0, 5);
-    }, [breeds, to]);
+        return breeds.data
+            .filter((breed) => !hidden.has(breed.id))
+            .map((breed) => {
+                if (breed.id === to.id) {
+                    return [0, breed];
+                }
+                return [similarity(
+                    extractComparisonVector(breed),
+                    toVec
+                ), breed]
+            })
+            .sort(([a], [b]) => b - a);
+    }, [breeds, to, hidden]);
 
     return (
         <Box
             sx={{
                 boxSizing: 'border-box',
+                width: '100%'
             }}
         >
-            <Title order={4}>Similar Breeds</Title>
-            <Box
+            <Title order={4} maw={rem(1000)} m='auto'>Similar Breeds</Title>
+            <Flex
                 py={rem(32)}
+                w='100%'
+                justify='center'
                 sx={{
-                    maxWidth: '100%',
-                    overflow: 'auto',
+                    overflow: 'auto'
                 }}
             >
-                <Box
-                    sx={{
-                        width: 'max-content',
-                        display: 'flex',
-                        flexWrap: 'nowrap',
-                        gap: rem(16),
-                        height: rem(200),
-                    }}
-                >
+                <Flex wrap='nowrap' gap='lg' h={rem(200)} w={rem(1000)} maw='100%' justify='start' align='center'                >
                     {
-                        topSimilar.map(([_, breed]) => (
-                            <Box key={breed.id} sx={{ height: 200, width: 200, '&:empty': { display: "none" } }}>
-                                <BreedLinkCard breed={breed} />
-                            </Box>
-                        ))
+                        topSimilar
+                            .slice(0, 5)
+                            .map(([_, breed]) => (
+                                <Box key={breed.id} sx={{ height: 200, width: 200, '&:empty': { display: "none" } }}>
+                                    <BreedLinkCard breed={breed} />
+                                </Box>
+                            ))
                     }
-                </Box>
-            </Box>
+                </Flex>
+            </Flex>
         </Box>
     )
 }

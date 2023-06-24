@@ -261,15 +261,13 @@ export function CatBreed() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          width: rem(1000),
-          margin: 'auto',
           paddingBottom: rem(48),
           overflow: 'hidden',
         }}
       >
         {error && <Alert title="Failed to load breed!">{error}</Alert>}
         {breed && (
-          <Grid sx={{ width: '100%' }}>
+          <Grid sx={{ width: '100%', maxWidth: rem(1000), margin: 'auto' }}>
             <Grid.Col span={12}>
               {title}
             </Grid.Col>
@@ -303,15 +301,9 @@ export function CatBreed() {
                 </Grid.Col>
               </Grid>
             </Grid.Col>
-            <Grid.Col xs={12}>
-              <Grid sx={{ maxWidth: '100% !important', overflow: 'hidden', margin: 0 }}>
-                <Grid.Col span={12} maw='100%'>
-                  <SimilarBreeds to={breed} />
-                </Grid.Col>
-              </Grid>
-            </Grid.Col>
           </Grid>
         )}
+        <SimilarBreeds to={breed} />
       </Box>
     </>
   );

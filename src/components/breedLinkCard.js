@@ -1,4 +1,4 @@
-import { ActionIcon, Card, Space, Text, useMantineTheme, Box } from "@mantine/core";
+import { ActionIcon, Card, Space, Text, useMantineTheme, Box, rem } from "@mantine/core";
 import { useBreedImageUrl } from "../APIs/cats";
 import { Link } from "react-router-dom";
 import { EmptyBreedImage } from "./emptyBreedImage";
@@ -62,7 +62,7 @@ export function BreedLinkCard({ breed, ignoreHidden = false }) {
     };
 
     return <Box ref={ref} sx={{ position: 'relative', aspectRatio: '1/1' }}>
-        <Card component={Link} to={`/breed/${breed.id}`} display='flex' shadow='sm' radius='md' w="100%" h='100%' maw={350} mah={350}>
+        <Card component={Link} to={`/breed/${breed.id}`} display='flex' shadow='sm' radius='md' w="100%" h='100%' maw={rem(250)} mah={rem(250)}>
             <Card.Section sx={{
                 height: 'min-content', display: 'flex', flex: '1 1 auto',
                 height: '100%',

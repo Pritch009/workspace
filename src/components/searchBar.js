@@ -1,29 +1,41 @@
 import { useEffect, useState, useMemo } from "react";
 import { BsSearchHeart } from "react-icons/bs";
-import { Box, Input, rem, Title, Text, Alert, Portal, Stack, Grid, Group, Flex } from "@mantine/core";
+import { Box, Input, rem, Title, Text, Alert, Portal, Stack, Grid, Group, Flex, Select } from "@mantine/core";
 import { useBreeds } from "../APIs/cats";
 import Fuse from "fuse.js";
-import { useClickOutside } from "@mantine/hooks";
-import { Link, useLocation } from "react-router-dom";
 import { useFilter } from "../contexts/filterContext";
 import { BreedLinkCard } from "./breedLinkCard";
 import { FilterModal } from "./filterModal";
-import { OriginSelect } from "./originSelect";
 import { EmptyBreedImage } from "./emptyBreedImage";
 import { HiddenModal } from "./hiddenModal";
 
 const fuseOptions = {
   includeScore: true,
   shouldSort: true,
-  keys: ["name", "description"],
+  keys: [
+    { name: "name", weight: 0.8 },
+    { name: 'origin', weight: 0.3 },
+    { name: 'description', weight: 0.3 },
+  ]
 };
+
+const SortFunctions = {
+  Alphabetical: ({ breed: a }, { breed: b }) => {
+    return a.name.localeCompare(b.name);
+  },
+  Relevancy: ({ score: a }, { score: b }) => {
+    return b - a
+  },
+}
 
 export function SearchBar() {
   const { data: breeds, loading: loadingBreeds, error } = useBreeds();
   const [err, setErr] = useState(null);
   const [searchValue, setSearchValue] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+  const [sortFn, setSortFn] = useState('Alphabetical');
   const [filter] = useFilter();
+
   const fuseFilter = useMemo(() => {
     if (Object.keys(filter).length === 0) {
       return {};
@@ -43,14 +55,19 @@ export function SearchBar() {
     history.replaceState({ searchText: newValue }, "", location.href);
   };
 
+  const onChangeSortFn = (value) => {
+    setSortFn(value);
+  }
+
   useEffect(() => {
     if (breeds && breeds.length > 0) {
+      let ordered;
       if (searchValue.length > 0) {
         const fuse = new Fuse(breeds, fuseOptions);
         let results = fuse.search(searchValue, fuseFilter);
-        setSuggestions(results.filter(({ score }) => score < 0.3));
+        ordered = results.filter(({ score }) => score < 0.3).map(({ score, item }) => ({ score, breed: item }));
       } else {
-        let randomOrder = breeds
+        ordered = breeds
           .filter((item) => {
             for (let key in filter) {
               if (item[key] !== filter[key]) {
@@ -59,12 +76,18 @@ export function SearchBar() {
             }
             return true;
           })
-          .sort(({ name: a }, { name: b }) => a.localeCompare(b))
-          .map((item) => ({ item }));
-        setSuggestions(randomOrder);
+          .map((breed) => ({ breed, score: 0 }));
       }
+      setSuggestions(ordered);
     }
   }, [breeds, searchValue, fuseFilter, filter]);
+
+  useEffect(() => {
+    if (suggestions.length > 0) {
+      let sorter = SortFunctions[sortFn] ?? SortFunctions.Alphabetical;
+      setSuggestions(suggestions.sort(sorter))
+    }
+  }, [suggestions, sortFn])
 
   return (
     <Stack
@@ -85,20 +108,21 @@ export function SearchBar() {
             placeholder="Search by Breed"
           />
           <Group position='apart' spacing='md'>
-            <HiddenModal />
+            <SortBySelector currentValue={sortFn} onChange={onChangeSortFn} />
             <FilterModal />
+            <HiddenModal />
           </Group>
           {
             suggestions.length > 0 && (
-              <Flex justify='start' gap='lg' pb='lg' wrap='wrap'>
-                {suggestions.map(({ item: suggestion }, index) => (
-                  <Box
+              <Grid gutter='lg' justify="start" w='auto'>
+                {suggestions.map(({ breed: suggestion }, index) => (
+                  <Grid.Col
+                    span="auto"
                     key={suggestion.id}
                     sx={{
                       flex: '1 0 auto',
                       minWidth: rem(170),
-                      maxWidth: rem(220),
-                      width: '20vw',
+                      maxWidth: rem(242),
                       aspectRatio: '1/1',
                       '&:empty': {
                         display: 'none',
@@ -109,9 +133,9 @@ export function SearchBar() {
                       index={index}
                       breed={suggestion}
                     />
-                  </Box>
+                  </Grid.Col>
                 ))}
-              </Flex>
+              </Grid>
             )
           }
           {
@@ -143,4 +167,17 @@ export function SearchBar() {
 
 function SearchOption({ breed, index, ...props }) {
   return <BreedLinkCard breed={breed} />
+}
+
+
+function SortBySelector({ currentValue, onChange }) {
+  return <Select
+    value={currentValue}
+    onChange={onChange}
+    data={
+      Object.keys(SortFunctions).map((key) => ({
+        label: key, value: key
+      }))
+    }
+  />
 }

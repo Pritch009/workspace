@@ -97,7 +97,7 @@ export function FilterModal() {
 
     return <>
         <Flex gap={rem(8)} sx={{ flex: '1 1 auto' }} align='center' justify='end'>
-            {count && <Button variant='subtle' leftIcon={<MdClose />} onClick={clearFilter}>Clear</Button>}
+            {count && <Button variant='subtle' size="sm" leftIcon={<MdClose />} onClick={clearFilter}>Clear</Button>}
             <Button leftIcon={<BsFilter />} onClick={openFilter} rightIcon={count}>Filter</Button>
         </Flex>
         <Modal opened={open} onClose={closeFilter} title='Filter Breeds' centered sx={{ flexBasis: '1000px' }}>
