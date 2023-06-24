@@ -20,8 +20,8 @@ export function HiddenModal() {
 
     return <>
         {someHidden && <Button onClick={onOpen} color='red'>Hidden ({hidden.size})</Button>}
-        <Modal opened={opened} title='Hidden Breeds' onClose={onClose} maw={rem(2000)} w='100%'>
-            <Flex gap='lg' wrap='wrap' justify='start' pt={rem(16)}>
+        <Modal opened={opened} title={`Hidden Breeds (${hidden.size})`} onClose={onClose} maw={rem(2000)} w='100%'>
+            <Flex gap='lg' wrap='wrap' justify='center' py={rem(16)}>
                 {
                     Array.from(hidden.entries()).map(([id, breed]) => (
                         <Box key={id} sx={{ aspectRatio: '1/1', width: '150px' }}>

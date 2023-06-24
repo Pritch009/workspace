@@ -62,7 +62,7 @@ export function BreedLinkCard({ breed, ignoreHidden = false }) {
     };
 
     return <Box ref={ref} sx={{ position: 'relative', aspectRatio: '1/1' }}>
-        <Card component={Link} to={`/breed/${breed.id}`} display='flex' shadow='sm' radius='md' w="100%" h='100%' maw={rem(250)} mah={rem(250)}>
+        <Card component={Link} to={`/breed/${breed.id}`} display='flex' shadow='sm' radius='md' w="100%" h='100%'>
             <Card.Section sx={{
                 height: 'min-content', display: 'flex', flex: '1 1 auto',
                 height: '100%',
@@ -91,8 +91,8 @@ export function BreedLinkCard({ breed, ignoreHidden = false }) {
 
             </Card.Section>
         </Card>
-        <ActionIcon onClick={onClickHideButton} size='lg' bg={`${theme.colors.red[6]}60`} variant="filled" radius='md' sx={[hideButtonSx, { position: 'absolute', transition: '0.2s', zIndex: 1, backdropFilter: 'blur(3px)', path: { stroke: 'white' } }]}>
+        <ActionIcon onClick={onClickHideButton} size='lg' bg={`${theme.colors[ignoreHidden ? 'blue' : 'red'][6]}70`} variant="filled" radius='md' sx={[hideButtonSx, { position: 'absolute', transition: '0.2s', zIndex: 1, backdropFilter: 'blur(3px)', path: { stroke: 'white' } }]}>
             <DisplayIcon fontSize='1.2rem' color="white" />
         </ActionIcon>
-    </Box>
+    </Box >
 }

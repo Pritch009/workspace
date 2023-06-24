@@ -1,74 +1,9 @@
 import { Box, Button, Flex, Grid, Modal, Select, Space, Stack, Text, Title, rem } from "@mantine/core";
 import { BsFilter } from 'react-icons/bs';
-import { useFilter } from "../contexts/filterContext";
+import { useFilter, FilterOptions } from "../contexts/filterContext";
 import { useMemo, useState } from "react";
 import { MdClose } from "react-icons/md";
 import { OriginSelect } from "./originSelect";
-
-
-const FilterOptions = [
-    {
-        label: 'Hairless',
-        field: 'hairless',
-        options: [
-            { label: 'Hairless', value: 1 },
-            { label: 'Not hairless', value: 0 }
-        ]
-    },
-    {
-        label: 'Rare',
-        field: 'rare',
-        options: [
-            { label: 'Rare', value: 1 },
-            { label: 'Common', value: 0 }
-        ]
-    },
-    {
-        label: 'Suppressed Tail',
-        field: 'suppressed_tail',
-        options: [
-            { label: 'Suppressed Tail', value: 1 },
-            { label: 'Not Suppressed Tail', value: 0 }
-        ]
-    },
-    {
-        label: 'Leg Size',
-        field: 'short_legs',
-        options: [
-            { label: 'Short Legs', value: 1 },
-            { label: 'Normal Legs', value: 0 }
-        ]
-    },
-    {
-        label: 'Hypoallergenic',
-        field: 'hypoallergenic',
-        options: [
-            { label: 'Hypoallergenic', value: 1 }
-        ]
-    },
-    {
-        label: 'Experimental',
-        field: 'experimental',
-        options: [
-            { label: 'Experimental', value: 1 }
-        ]
-    },
-    {
-        label: 'Natural',
-        field: 'natural',
-        options: [
-            { label: 'Natural', value: 1 }
-        ]
-    },
-    {
-        label: 'Lap Kitties',
-        field: 'lap',
-        options: [
-            { label: 'Lap Kitties', value: 1 },
-        ]
-    }
-]
-
 
 export function FilterModal() {
     const [open, setOpen] = useState(false);

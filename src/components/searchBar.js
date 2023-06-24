@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { BsSearchHeart } from "react-icons/bs";
-import { Box, Input, rem, Title, Text, Alert, Portal, Stack, Grid, Group, Flex, Select } from "@mantine/core";
+import { Box, Input, rem, Title, Text, Alert, Portal, Stack, Grid, Group, Flex, Select, Pagination } from "@mantine/core";
 import { useBreeds } from "../APIs/cats";
 import Fuse from "fuse.js";
 import { useFilter } from "../contexts/filterContext";
@@ -8,6 +8,8 @@ import { BreedLinkCard } from "./breedLinkCard";
 import { FilterModal } from "./filterModal";
 import { EmptyBreedImage } from "./emptyBreedImage";
 import { HiddenModal } from "./hiddenModal";
+import { useCoupledState } from "../hooks/useCoupledState";
+import { useLocalState } from "../hooks/useLocalState";
 
 const fuseOptions = {
   includeScore: true,
@@ -20,20 +22,31 @@ const fuseOptions = {
 };
 
 const SortFunctions = {
-  Alphabetical: ({ breed: a }, { breed: b }) => {
-    return a.name.localeCompare(b.name);
-  },
-  Relevancy: ({ score: a }, { score: b }) => {
-    return b - a
-  },
+  Relevancy: ({ score: a }, { score: b }) => b - a,
+  Alphabetical: ({ breed: a }, { breed: b }) => a.name.localeCompare(b.name),
+  'High Energy': compareBreedFields('energy_level', true),
+  'Low Energy': compareBreedFields('energy_level', false),
+  'High Maintenance': compareBreedFields('grooming', true),
+  'Low Maintenance': compareBreedFields('grooming', false),
+}
+
+function compareBreedFields(field, ascending) {
+  return ({ breed: a }, { breed: b }) => {
+    let v1 = a[field];
+    let v2 = b[field];
+
+    return ascending ? v2 - v1 : v1 - v2;
+  }
 }
 
 export function SearchBar() {
   const { data: breeds, loading: loadingBreeds, error } = useBreeds();
   const [err, setErr] = useState(null);
   const [searchValue, setSearchValue] = useState("");
+  const [sortFn, setSortFn] = useState('Relevancy');
   const [suggestions, setSuggestions] = useState([]);
-  const [sortFn, setSortFn] = useState('Alphabetical');
+  const [pageSize, setPageSize] = useState(PageSizeOptions[1]);
+  const [page, setPage] = useState(0);
   const [filter] = useFilter();
 
   const fuseFilter = useMemo(() => {
@@ -47,18 +60,12 @@ export function SearchBar() {
         })),
       ]
     }
-  }, [filter])
+  }, [filter]);
 
-  const onChange = (event) => {
-    const newValue = event.currentTarget.value;
-    setSearchValue(newValue);
-    history.replaceState({ searchText: newValue }, "", location.href);
-  };
-
-  const onChangeSortFn = (value) => {
-    setSortFn(value);
-  }
-
+  const suggestionWindow = useMemo(() => {
+    return suggestions.slice(page * pageSize, (page + 1) * pageSize);
+  }, [suggestions, page, pageSize]);
+  const numPages = useMemo(() => Math.ceil(suggestions.length / pageSize), [suggestions, pageSize]);
   useEffect(() => {
     if (breeds && breeds.length > 0) {
       let ordered;
@@ -85,9 +92,31 @@ export function SearchBar() {
   useEffect(() => {
     if (suggestions.length > 0) {
       let sorter = SortFunctions[sortFn] ?? SortFunctions.Alphabetical;
-      setSuggestions(suggestions.sort(sorter))
+      setSuggestions([
+        ...suggestions.sort(sorter)
+      ])
     }
-  }, [suggestions, sortFn])
+  }, [sortFn]);
+
+  const onChange = (event) => {
+    const newValue = event.currentTarget.value;
+    setSearchValue(newValue);
+    setPage(0);
+  };
+
+  const onChangePageSize = (value) => {
+    setPageSize(value);
+    setPage(0);
+  }
+
+  const onChangeSortFn = (value) => {
+    setSortFn(value);
+    setPage(0);
+  }
+
+  const onSetPage = (page) => {
+    setPage(page - 1);
+  }
 
   return (
     <Stack
@@ -107,35 +136,53 @@ export function SearchBar() {
             onChange={onChange}
             placeholder="Search by Breed"
           />
-          <Group position='apart' spacing='md'>
-            <SortBySelector currentValue={sortFn} onChange={onChangeSortFn} />
+          <Flex position='apart' gap='md' align="end" wrap='wrap'>
+            <Flex gap='md' align='end' sx={{ flex: '1 0 200px' }}>
+              <PageSizeSelector currentValue={pageSize} onChange={onChangePageSize} />
+              <SortBySelector currentValue={sortFn} onChange={onChangeSortFn} />
+            </Flex>
             <FilterModal />
             <HiddenModal />
-          </Group>
+          </Flex>
           {
             suggestions.length > 0 && (
-              <Grid gutter='lg' justify="start" w='auto'>
-                {suggestions.map(({ breed: suggestion }, index) => (
-                  <Grid.Col
-                    span="auto"
-                    key={suggestion.id}
-                    sx={{
-                      flex: '1 0 auto',
-                      minWidth: rem(170),
-                      maxWidth: rem(242),
-                      aspectRatio: '1/1',
-                      '&:empty': {
-                        display: 'none',
-                      }
-                    }}
-                  >
-                    <SearchOption
-                      index={index}
-                      breed={suggestion}
-                    />
-                  </Grid.Col>
-                ))}
-              </Grid>
+              <>
+                <Grid gutter='lg' justify="start" w='auto'>
+                  {suggestionWindow
+                    .map(({ breed: suggestion }, index) => (
+                      <Grid.Col
+                        span="auto"
+                        key={suggestion.id}
+                        sx={{
+                          flex: '1 0 auto',
+                          minWidth: rem(170),
+                          maxWidth: rem(242),
+                          aspectRatio: '1/1',
+                          '&:empty': {
+                            display: 'none',
+                          }
+                        }}
+                      >
+                        <SearchOption
+                          index={index}
+                          breed={suggestion}
+                        />
+                      </Grid.Col>
+                    ))
+                  }
+                </Grid>
+                {
+                  numPages > 1 && (
+                    <Flex justify='center' p={rem(32)}>
+                      <Pagination
+                        page={page + 1}
+                        onChange={onSetPage}
+                        total={numPages}
+                      />
+                    </Flex>
+                  )
+                }
+              </>
             )
           }
           {
@@ -174,9 +221,48 @@ function SortBySelector({ currentValue, onChange }) {
   return <Select
     value={currentValue}
     onChange={onChange}
+    label='Sort By'
     data={
       Object.keys(SortFunctions).map((key) => ({
         label: key, value: key
+      }))
+    }
+  />
+}
+
+const PageSizeOptions = [5, 10, 25, 50, 100];
+function PageSizeSelector({ currentValue, onChange }) {
+  const [localState, setLocalState] = useLocalState(
+    'cats.browse.pageSize',
+    currentValue,
+    (value) => {
+      const parsed = parseInt(value);
+      if (isNaN(parsed)) {
+        return null;
+      }
+      return parsed;
+    }
+  );
+
+  useCoupledState(
+    currentValue,
+    setLocalState
+  );
+
+  useEffect(() => {
+    if (localState !== null) {
+      onChange(localState);
+    }
+  }, []);
+
+  return <Select
+    w='fit-content'
+    value={localState}
+    onChange={onChange}
+    label='Page Size'
+    data={
+      PageSizeOptions.map((value) => ({
+        label: value, value
       }))
     }
   />

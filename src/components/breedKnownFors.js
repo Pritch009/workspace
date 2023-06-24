@@ -138,8 +138,6 @@ export function BreedKnownFors({ breed }) {
                 }
             }
 
-            console.log(sortKey, key, display, bg);
-
             const element = display && (
                 <Card
                     py={rem(8)}
@@ -175,8 +173,6 @@ export function BreedKnownFors({ breed }) {
                 sorted[sortedKey] = arr;
             }
         }
-
-        console.log(sorted);
 
         return [
             sorted['high'] ?? [],

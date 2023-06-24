@@ -63,6 +63,19 @@ export function CatBreed() {
     </Box>
   )
 
+  const TraitBadges = [
+    { field: 'indoor', color: 'green', display: 'Indoor', hint: 'Indoor cats live best inside.' },
+    { field: 'lap', color: 'orange', display: 'Lap Kitty', hint: 'Lap kitties love to sit on your lap.' },
+    { field: 'hairless', color: 'purple', display: 'Hairless', hint: 'Hairless cats have very little to no hair.' },
+    { field: 'rare', color: 'red', display: 'Rare', hint: 'Rare cats are difficult to acquire.' },
+    { field: 'experimental', color: 'blue', display: 'Experimental', hint: 'Experimental cats do not have the recognition of any major national or international cat registries.' },
+    { field: 'rex', color: 'green', display: 'Rex', hint: 'Rex cats have curly hair.' },
+    { field: 'suppressed_tail', color: 'yellow', display: 'Suppressed Tail', hint: 'Suppressed tail cats have a short tail.' },
+    { field: 'short_legs', color: 'pink', display: 'Short Legs', hint: 'Short legged cats have short legs.' },
+    { field: 'hypoallergenic', color: 'teal', display: 'Hypoallergenic', hint: 'Hypoallergenic cats are less likely to cause allergic reactions.' },
+    { field: 'natural', color: 'cyan', display: 'Natural', hint: 'Natural breeds have been found in nature.' },
+  ]
+
   const LinkLogo = ({ alt, src, ...props }) => <img src={src} alt={alt} height={30} width='auto' {...props} />;
 
   const backButton = (
@@ -107,7 +120,7 @@ export function CatBreed() {
   );
 
   const alsoKnownAs = (
-    breed?.alt_names && <Card radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
+    (breed?.alt_names?.trim?.()?.length ?? 0) > 0 && <Card radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Also known as</Text>
         <Text size='md' weight='normal' transform="capitalize">{breed?.alt_names}</Text>
@@ -116,7 +129,7 @@ export function CatBreed() {
   );
 
   const temperament = (
-    breed?.temperament && <Card radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
+    (breed?.temperament?.trim?.()?.length ?? 0) > 0 && <Card radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Temperament</Text>
         <Text size='md' weight='normal'>{breed?.temperament}</Text>
@@ -125,7 +138,7 @@ export function CatBreed() {
   )
 
   const lifeSpan = (
-    breed?.life_span && <Card radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
+    breed?.life_span && <Card radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Life Span</Text>
         <Text size='md' italic weight='normal'>{breed?.life_span} years</Text>
@@ -141,21 +154,21 @@ export function CatBreed() {
       </Box>
     </Card>
   );
+
   const badges = (
     breed && <Box py={rem(16)} sx={{ display: 'flex', flexWrap: 'wrap', width: '100%', gap: rem(8), justifyContent: 'center' }}>
       <Badge variant="outline" color='gray' size="lg" leftSection={<NationalFlag countryCode={breed?.country_code} />}>
         {breed?.origin}
       </Badge>
-      <TraitBadge value={breed.indoor} color='green' display='Indoor' leftSection={<FaCouch fontSize={rem(16)} />} />
-      <TraitBadge value={breed.lap} color='orange' display='Lap Kitty' />
-      <TraitBadge value={breed.hairless} color='purple' display='Hairless' />
-      <TraitBadge value={breed.rare} color='red' display='Rare' />
-      <TraitBadge value={breed.experimental} color='blue' display='Experimental' />
-      <TraitBadge value={breed.rex} color='green' display='Rex' />
-      <TraitBadge value={breed.suppressed_tail} color='yellow' display='Suppressed Tail' />
-      <TraitBadge value={breed.short_legs} color='pink' display='Short Legs' />
-      <TraitBadge value={breed.hypoallergenic} color='teal' display='Hypoallergenic' />
-      <TraitBadge value={breed.natural} color='cyan' display='Natural' />
+      {
+        TraitBadges.map(({ field, color, display, icon, hint }) => (
+          <Tooltip key={field} label={hint}>
+            <Box sx={{ display: 'flex', '&:empty': { display: 'none' } }}>
+              <TraitBadge value={breed[field]} color={color} display={display} leftSection={icon} />
+            </Box>
+          </Tooltip>
+        ))
+      }
     </Box>
   )
 
@@ -273,7 +286,7 @@ export function CatBreed() {
             </Grid.Col>
             <Grid.Col xs={12} sx={{ display: 'flex', flexDirection: "column", alignItems: 'start', gap: rem(16) }}>
               <Grid>
-                <Grid.Col xs={12} sm={6} md={4} xl={3} sx={{ display: 'flex', flexDirection: "column", alignItems: 'start' }}>
+                <Grid.Col xs={12} sm={6} md={5} sx={{ display: 'flex', flexDirection: "column", alignItems: 'start' }}>
                   <Grid gutter='none' grow sx={{ width: '100%', margin: '0 auto' }}>
                     <Grid.Col span={12}>
                       {image}
@@ -311,7 +324,6 @@ export function CatBreed() {
 
 function TraitBadge({ value: _value, color, display, invert = false, leftSection }) {
   const value = _value && _value === (Boolean(invert) ? 0 : 1);
-  console.log(value, color, display);
   if (!value) {
     return null;
   }

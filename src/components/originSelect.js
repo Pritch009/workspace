@@ -21,7 +21,6 @@ export function OriginSelect() {
     }, [breeds]);
 
     const onSelect = (country_code) => {
-        console.log('Selected ', country_code);
         if (currentSelection?.country_code === country_code) {
             setFilter((prev) => ({
                 ...prev,
@@ -43,11 +42,6 @@ export function OriginSelect() {
             }
         });
     }
-
-    console.log('options', options);
-    console.log('breeds', breeds);
-
-    console.log(Array.from(new Set(breeds.map(({ country_code }) => country_code))).sort().toString());
 
     return (
         <Flex w="100%" gap='md'>

@@ -54,13 +54,11 @@ export function useBreed(breedId) {
     return {};
   }
   if (breeds.data) {
-    console.log("Breeds: ", breeds.data);
     const breed = breeds.data.find(
       (breed) => breed.id.localeCompare(breedId) === 0
     );
 
     if (!breed) {
-      console.log(`Could not find ${breedId} in breeds: ${breeds.data.map(({ id }) => id)}`)
       return { error: `Unknown breed: ${breedId}` };
     }
 
