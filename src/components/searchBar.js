@@ -123,6 +123,7 @@ export function SearchBar() {
       sx={{
         position: "relative",
         width: "100%",
+        flex: '1 1 auto',
       }}
     >
       {error && <Alert title="Error!" color='red'>{error?.response?.statusText ?? "Unknown error occurred, unable to reach the Cat API!"}</Alert>}
@@ -147,7 +148,7 @@ export function SearchBar() {
           {
             suggestions.length > 0 && (
               <>
-                <Grid gutter='lg' justify="start" w='auto'>
+                <Grid gutter='lg' justify="start" w='auto' align="start" sx={{ flex: '1 1 auto', alignContent: 'start' }}>
                   {suggestionWindow
                     .map(({ breed: suggestion }, index) => (
                       <Grid.Col

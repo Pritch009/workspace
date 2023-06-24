@@ -48,7 +48,7 @@ export function SimilarBreeds({ to }) {
                 width: '100%'
             }}
         >
-            <Title order={4} maw={rem(1000)} m='auto'>Similar Breeds</Title>
+            <Title order={4} maw={rem(1000)} mx='auto'>Similar Breeds</Title>
             <Flex
                 py={rem(32)}
                 w='100%'

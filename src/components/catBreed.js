@@ -280,7 +280,7 @@ export function CatBreed() {
       >
         {error && <Alert title="Failed to load breed!">{error}</Alert>}
         {breed && (
-          <Grid sx={{ width: '100%', maxWidth: rem(1000), margin: 'auto' }}>
+          <Grid sx={{ width: '100%', maxWidth: rem(1000), margin: '0 auto' }}>
             <Grid.Col span={12}>
               {title}
             </Grid.Col>
