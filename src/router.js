@@ -4,6 +4,12 @@ import { useEffect } from 'react';
 import { ContextsWrapper } from './contexts';
 import { BrowseCatBreeds } from './components/browseCatBreeds';
 
+/**
+ * Basic routing for 2 pages:
+ * - Browse
+ * - View Breed
+ * @returns {JSX.Element}
+ */
 export function Router() {
     return (
         <ContextsWrapper>

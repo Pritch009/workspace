@@ -17,6 +17,11 @@ const BooleanFieldWeights = [20, 5, 10, 20, 5, 10, 1];
  */
 
 /**
+ * @typedef SimilarBreedsProps
+ * @property {Breed} to
+ */
+
+/**
  * Extracts the values needed to perform a comparison from a breed object.
  * @param {Breed} breed 
  * @returns {number[]} 
@@ -27,11 +32,6 @@ function extractComparisonVector(breed) {
         Object.values(pick(breed, SimilarityFields)).map((val) => val === undefined ? 0 : val)
     ].flat()
 }
-
-/**
- * @typedef SimilarBreedsProps
- * @property {Breed} to
- */
 
 /**
  * 

@@ -1,3 +1,5 @@
+// Using Mantine to save on time and effort for styling
+
 export const theme = {
     colorScheme: 'light',
     color: {

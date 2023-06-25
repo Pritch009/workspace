@@ -94,6 +94,11 @@ reference_image_id	"0XYvRd7oD"
 
 //documentation @https://docs.thecatapi.com/
 //feel free to add more functions!
+
+/**
+ * Use all breeds known to the API
+ * @returns {import('axios').AxiosResponse<Breed[]>}
+ */
 export function useBreeds() {
   return useAxios(
     {
@@ -104,6 +109,11 @@ export function useBreeds() {
   )[0];
 }
 
+/**
+ * Gets a specific breed by its id
+ * @param {string} breedId 
+ * @returns {{ breed: Breed } | { error: string } | {}}
+ */
 export function useBreed(breedId) {
   const breeds = useBreeds();
   if (breeds.loading) {
@@ -124,6 +134,14 @@ export function useBreed(breedId) {
   }
 }
 
+/**
+ * Returns an object with the url for a breed's reference image.
+ * This image id is provided by the breed object.
+ * 
+ * This is also backed up to a call for any images of the breed should the reference id not work.
+ * @param {string} reference_image_id 
+ * @returns {{ url: string, id: string } | undefined | null}
+ */
 export function useBreedReferenceImage(reference_image_id) {
   const [state, setState] = useLocalState(`image.${reference_image_id}`, null);
 
@@ -150,6 +168,13 @@ export function useBreedReferenceImage(reference_image_id) {
   return loading ? undefined : (state ?? null);
 }
 
+/**
+ * Gets the url objects for a breed's images.  
+ * This returns multiple images of the breed.
+ * @param {string} breedId 
+ * @param {number|undefined} limit 
+ * @returns 
+ */
 export function useBreedImageUrl(breedId, limit = 1) {
   const [state, setState] = useLocalState(`carousel.${breedId}.${limit}`, null);
   const [{ data }, fetch] = useAxios(

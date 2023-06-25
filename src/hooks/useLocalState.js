@@ -1,5 +1,17 @@
 import { useMemo, useState } from "react";
 
+/**
+ * Uses local storage to store state
+ * Will attempt to load from local storage on first render, 
+ * and will save to local storage on every state change.
+ * 
+ * Changing local storage will not trigger a re-render, and will
+ * be lost should the state be written to before a page refresh.
+ * @param {string} key 
+ * @param {any} defaultValue 
+ * @param {(value: any) => any} parse 
+ * @returns 
+ */
 export function useLocalState(key, defaultValue, parse = (val) => val) {
     const localState = useMemo(() => {
         try {

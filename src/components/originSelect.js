@@ -4,6 +4,11 @@ import { useMemo } from "react";
 import { useFilter } from "../contexts/filterContext";
 import { NationalFlag, getNationalFlagChar } from "./nationalFlag";
 
+/**
+ * Allows the selection of a given country of origin for a breed
+ * This will enter FilterContext entry for country_code
+ * @returns {JSX.Element}
+ */
 export function OriginSelect() {
     const { data: breeds } = useBreeds();
     const [filter, setFilter] = useFilter();

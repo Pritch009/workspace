@@ -3,6 +3,11 @@ import { useHideContext } from "../contexts/hideContext";
 import { useEffect, useMemo, useState } from "react";
 import { BreedLinkCard } from "./breedLinkCard";
 
+/**
+ * Modal to display hidden breeds
+ * Like the Filter Modal, this is a modal with it's own button
+ * @returns {JSX.Element}
+ */
 export function HiddenModal() {
     const [hidden] = useHideContext();
     const [opened, setOpened] = useState(false);
@@ -25,7 +30,7 @@ export function HiddenModal() {
                 {
                     Array.from(hidden.entries()).map(([id, breed]) => (
                         <Box key={id} sx={{ aspectRatio: '1/1', width: '150px' }}>
-                            <BreedLinkCard breed={breed} ignoreHidden={true} />
+                            <BreedLinkCard breed={breed} forHidden={true} />
                         </Box>
                     ))
                 }

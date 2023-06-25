@@ -1,6 +1,14 @@
 import React, { forwardRef, useMemo } from 'react';
 import { Text, rem } from '@mantine/core';
 
+/**
+ * Displays the nation flag emoji for a given country code
+ * @param {{
+ *  countryCode: string,
+ *  sx: any,
+ * } & import('react').ComponentPropsWithRef<'div'>} props
+ * @returns {JSX.Element}
+ */
 export const NationalFlag = forwardRef(
     function NationalFlag({ countryCode, sx, ...props }, ref) {
         // given a country code, return the flag as an unicode emoji
@@ -11,6 +19,11 @@ export const NationalFlag = forwardRef(
     }
 );
 
+/**
+ * Returns the flag emoji for a given country code
+ * @param {string} countryCode 
+ * @returns 
+ */
 export function getNationalFlagChar(countryCode) {
     // AE,AU,CA,CN,CY,EG,FR,GB,GR,IM,IR,JP,MM,NO,RU,SO,SP,TH,TR,US
     switch (countryCode) {

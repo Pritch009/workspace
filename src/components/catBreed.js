@@ -66,12 +66,52 @@ const CarouselVariants = {
   }
 }
 
+const GridVariants = {
+  hidden: {
+    opacity: 0,
+  },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+    }
+  }
+}
+
+const CardVariants = {
+  hidden: {
+    opacity: 0,
+    y: 10
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      damping: 20,
+      stiffness: 100,
+      duration: 1
+    }
+  },
+}
+
+const CardMotionProps = {
+  // initial: 'hidden',
+  // whileInView: 'visible',
+  variants: CardVariants,
+}
+
+/**
+ * Cat Breed Profile Page
+ * @returns {JSX.Element}
+ */
 export function CatBreed() {
   const { breedId } = useParams();
   const { breed, error } = useBreed(breedId);
   const imagesUrls = useBreedImageUrl(breedId, 5);
   const referenceImage = useBreedReferenceImage(breed?.reference_image_id)
 
+  /// Carousel Images
   const images = useMemo(() => {
     const images = {};
     for (const image of [referenceImage, ...imagesUrls]) {
@@ -94,8 +134,9 @@ export function CatBreed() {
         }}
       />
     ))
-  });
+  }, [imagesUrls, referenceImage]);
 
+  /// Effect to scroll to top when breed changes
   useEffect(() => {
     setTimeout(() => {
       window.scrollTo({
@@ -105,6 +146,7 @@ export function CatBreed() {
     }, 50);
   }, [breed]);
 
+  /// Links for learning more on other sites
   const learnMoreLinks = (
     breed && (
       <MotionBox
@@ -120,11 +162,10 @@ export function CatBreed() {
     )
   );
 
+  /// Known for section
+  const knownFor = <BreedKnownFors breed={breed} />
 
-  const knownFor = (
-    <BreedKnownFors breed={breed} />
-  )
-
+  /// Description section
   const description = (
     isNotEmptyString(breed?.description) && <MotionCard key='description' {...CardMotionProps} shadow="md" radius='lg' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
       <Box>
@@ -134,6 +175,7 @@ export function CatBreed() {
     </MotionCard>
   );
 
+  /// Also known as section
   const alsoKnownAs = (
     isNotEmptyString(breed?.alt_names) && <MotionCard key='alt_names' {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
       <Box>
@@ -143,6 +185,7 @@ export function CatBreed() {
     </MotionCard>
   );
 
+  /// Temperament section
   const temperament = (
     isNotEmptyString(breed?.temperament) && <MotionCard key='temperament' {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
       <Box>
@@ -152,6 +195,7 @@ export function CatBreed() {
     </MotionCard>
   );
 
+  /// Lifespan section
   const lifeSpan = (
     isNotEmptyString(breed?.life_span) && <MotionCard key='life_span' {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
       <Box>
@@ -161,6 +205,7 @@ export function CatBreed() {
     </MotionCard>
   );
 
+  /// Weight in standard units section
   const weightInStandard = (
     isNotEmptyString(breed?.weight.imperial) && <MotionCard key='weight' {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
       <Box>
@@ -170,6 +215,7 @@ export function CatBreed() {
     </MotionCard>
   )
 
+  /// Badges section
   const badges = (
     breed && <Box py={rem(16)} sx={{ display: 'flex', flexWrap: 'wrap', width: '100%', gap: rem(8), justifyContent: 'center' }}>
       <MotionBadge key='origin_badge' {...CardMotionProps} variant="outline" color='gray' size="lg" leftSection={<NationalFlag countryCode={breed?.country_code} />}>
@@ -184,6 +230,8 @@ export function CatBreed() {
       }
     </Box>
   );
+
+  /// Title section
   const title = (
     breed && <Box
       py={rem(16)}
@@ -204,7 +252,7 @@ export function CatBreed() {
     </Box>
   );
 
-
+  /// Image section
   const image = (
     breed && <Card
       key='carousel'
@@ -337,39 +385,4 @@ export function CatBreed() {
       </Box>
     </>
   );
-}
-
-const GridVariants = {
-  hidden: {
-    opacity: 0,
-  },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-    }
-  }
-}
-
-const CardVariants = {
-  hidden: {
-    opacity: 0,
-    y: 10
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: 'spring',
-      damping: 20,
-      stiffness: 100,
-      duration: 1
-    }
-  },
-}
-
-const CardMotionProps = {
-  // initial: 'hidden',
-  // whileInView: 'visible',
-  variants: CardVariants,
 }

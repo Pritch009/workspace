@@ -5,6 +5,12 @@ import { useMemo, useState } from "react";
 import { MdClose } from "react-icons/md";
 import { OriginSelect } from "./originSelect";
 
+/**
+ * While stated as the modal, this is really the button that triggers the modal.
+ * The modal is included in this component as it's the only source it's used.
+ * We could make separate components if we wish to have multiple buttons that open the modal.
+ * @returns {JSX.Element}
+ */
 export function FilterModal() {
     const [open, setOpen] = useState(false);
     const [filterState, setFilterState] = useFilter();
@@ -59,6 +65,18 @@ export function FilterModal() {
     </>
 }
 
+/**
+ * 
+ * @param {{
+ *  field: string,
+ *  label: string,
+ *  options: {
+ *      label: string,
+ *      value: string
+ *  }[]
+ * }} props
+ * @returns 
+ */
 const FilterOptionSelect = ({ field, label, options }) => {
     const [filterState, setFilterState] = useFilter();
     const currentValue = useMemo(() => filterState[field], [filterState, field]);

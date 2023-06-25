@@ -1,18 +1,21 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ActionIcon, Box, Button } from "@mantine/core";
 import { MdArrowBack } from "react-icons/md";
 import { useViewportSize } from "@mantine/hooks";
 
+/**
+ * Since this is only 2 pages (browse and view breed),
+ * This is a simple button to go back to the browse page
+ * @returns {JSX.Element}
+ */
 export function GoBackButton() {
     const navigate = useNavigate();
     const { width: screenWidth } = useViewportSize();
 
-    const goBack = () => {
-        navigate('/');
-    };
-
     return (
         <Box
+            component={Link}
+            to='/'
             sx={{
                 flex: '1 1 auto',
                 boxSizing: 'border-box'
@@ -24,12 +27,13 @@ export function GoBackButton() {
                         size='sm'
                         variant='outline'
                         leftIcon={<MdArrowBack />}
-                        onClick={goBack}>
+                        type="button"
+                    >
                         Back
                     </Button>
                     : <ActionIcon
                         variant='outline'
-                        onClick={goBack}
+                        type='button'
                     >
                         <MdArrowBack />
                     </ActionIcon>

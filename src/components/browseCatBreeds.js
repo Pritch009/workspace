@@ -1,6 +1,10 @@
 import { Box, Flex, rem, Title } from "@mantine/core";
 import { SearchBar } from "./searchBar";
 
+/**
+ * Main Browse Cat Breeds Component
+ * @returns {JSX.Element}
+ */
 export function BrowseCatBreeds() {
   return (
     <Box

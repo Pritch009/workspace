@@ -5,6 +5,16 @@ export function LinkLogo({ alt, src, ...props }) {
     return <img src={src} alt={alt} height={30} width='auto' {...props} />
 }
 
+/**
+ * Button with an icon for a link.  
+ * This is used for external site links
+ * @param {{
+ *   Icon: import('react').FC<any>,
+ *   href: string,
+ *   label: string
+ * }} props 
+ * @returns 
+ */
 export function IconLink({ Icon, href, label }) {
     return (
         <Tooltip label={label}>

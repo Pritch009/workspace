@@ -2,6 +2,19 @@ import { useState, createContext, useContext } from "react";
 import { useLocalState } from "../hooks/useLocalState";
 import { pick } from "../utilities";
 
+/**
+ * @typedef {Object} Filter
+ * @property {number} hairless
+ * @property {number} rare
+ * @property {number} suppressed_tail
+ * @property {number} short_legs
+ * @property {number} hypoallergenic
+ * @property {number} experimental
+ * @property {number} natural
+ * @property {number} lap
+ * @property {string} country_code
+ */
+
 export const FilterOptions = [
     {
         label: 'Hairless',
@@ -68,6 +81,11 @@ export const FilterOptions = [
 
 const filterContext = createContext(null);
 
+/**
+ * Handles the filter to be applied to search results
+ * @param {{ children: import('react').ReactNode }} props 
+ * @returns 
+ */
 export function FilterContext({ children }) {
     const filterState = useLocalState('cats.browse.filter', {}, (filterState) => {
         if (typeof filterState !== 'object') {
@@ -81,6 +99,10 @@ export function FilterContext({ children }) {
     </filterContext.Provider>
 }
 
+/**
+ * Hook to access filter state
+ * @returns {[Filter, import('react').Dispatch<import('react').SetStateAction<Filter>>]}
+ */
 export function useFilter() {
     const filterState = useContext(filterContext);
 

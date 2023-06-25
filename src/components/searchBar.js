@@ -12,6 +12,7 @@ import { useCoupledState } from "../hooks/useCoupledState";
 import { useLocalState } from "../hooks/useLocalState";
 import { AnimatePresence, motion } from "framer-motion/dist/framer-motion";
 
+// Fuse options for searching
 const fuseOptions = {
   includeScore: true,
   shouldSort: true,
@@ -22,6 +23,23 @@ const fuseOptions = {
   ]
 };
 
+// Motion variants for the breed cards
+const BreedCardVariants = (index) => ({
+  hidden: {
+    opacity: 0,
+    y: 10
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      delay: index * 0.05,
+    }
+  }
+});
+
+// Sorting function to arrange search results
 const SortFunctions = {
   Relevancy: ({ score: a }, { score: b }) => b - a,
   Alphabetical: ({ breed: a }, { breed: b }) => a.name.localeCompare(b.name),
@@ -31,6 +49,7 @@ const SortFunctions = {
   'Low Maintenance': compareBreedFields('grooming', false),
 }
 
+// Compares two breeds by a field (used for sorting)
 function compareBreedFields(field, ascending) {
   return ({ breed: a }, { breed: b }) => {
     let v1 = a[field];
@@ -42,6 +61,10 @@ function compareBreedFields(field, ascending) {
 
 const MotionGridCol = motion(Grid.Col);
 
+/**
+ * SearchBar also contains the search results to help locate a breed.
+ * @returns {JSX.Element}
+ */
 export function SearchBar() {
   const { data: breeds, loading: loadingBreeds, error } = useBreeds();
   const [err, setErr] = useState(null);
@@ -244,20 +267,6 @@ export function SearchBar() {
   );
 }
 
-const BreedCardVariants = (index) => ({
-  hidden: {
-    opacity: 0,
-    y: 10
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      delay: index * 0.05,
-    }
-  }
-});
 
 function SearchOption({ breed, index, ...props }) {
   return <BreedLinkCard breed={breed} />

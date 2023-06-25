@@ -7,6 +7,7 @@ import { RiKakaoTalkFill } from "react-icons/ri";
 import { IoPeople } from "react-icons/io5";
 import { GiHairStrands, GiComb, GiHealthNormal, GiBrain } from "react-icons/gi";
 import { Box, rem, Card, Text, useMantineColorScheme, useMantineTheme } from "@mantine/core";
+import { motion } from "framer-motion/dist/framer-motion";
 
 const attributes = {
     adaptability: {
@@ -101,6 +102,32 @@ const attributes = {
     },
 };
 
+const MotionCard = motion(Card);
+
+const KnownForBadgeVariants = {
+    hidden: {
+        opacity: 0,
+        scale: 0.95,
+        y: 10
+    },
+    visible: {
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        transition: {
+            duration: 0.15
+        }
+    },
+};
+
+/**
+ * Displays properties of a breed that it is known for.
+ * This are calculated using the min and max values of the breed's attributes.
+ * @param {{
+ *  breed: import('../APIs/cats').Breed
+ * }} param0 
+ * @returns {JSX.Element}
+ */
 export function BreedKnownFors({ breed }) {
     const theme = useMantineTheme();
     const values = useMemo(() => {
@@ -120,7 +147,7 @@ export function BreedKnownFors({ breed }) {
             return (value === 1) ? low : high;
         }
 
-        const MapToElement = ([sortKey, key]) => {
+        const MapToElement = ([sortKey, key], index) => {
             const attr = attributes[key];
             const Icon = attr.Icon;
             const display = attr.display[sortKey];
@@ -139,7 +166,9 @@ export function BreedKnownFors({ breed }) {
             }
 
             const element = display && (
-                <Card
+                <MotionCard
+                    key={key}
+                    variants={KnownForBadgeVariants}
                     py={rem(8)}
                     sx={{
                         display: "flex",
@@ -151,7 +180,7 @@ export function BreedKnownFors({ breed }) {
                 >
                     <Icon fontSize="1.15rem" />
                     <Text size='sm'>{display}</Text>
-                </Card>
+                </MotionCard>
             );
 
             return [key, element];

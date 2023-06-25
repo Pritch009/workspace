@@ -2,6 +2,13 @@ import { useState, createContext, useContext } from "react";
 
 const hideContext = createContext(null);
 
+/**
+ * Hide context provider for hiding specific breeds
+ * @param {{
+ *   children: import('react').ReactNode
+ * }} props
+ * @returns 
+ */
 export function HideContext({ children }) {
     const hideState = useState(new Map());
 
@@ -10,6 +17,9 @@ export function HideContext({ children }) {
     </hideContext.Provider>
 }
 
+/**
+ *  Hook to access hide state 
+ */
 export function useHideContext() {
     const currentState = useContext(hideContext);
 
@@ -20,6 +30,11 @@ export function useHideContext() {
     return currentState;
 }
 
+/**
+ * Hook for a specific breed to check if it is hidden
+ * @param {import('../APIs/cats').Breed} breed 
+ * @returns 
+ */
 export function useIsHidden(breed) {
     const currentHideContext = useContext(hideContext);
     if (currentHideContext === null) {

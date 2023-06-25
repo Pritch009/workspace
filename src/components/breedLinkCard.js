@@ -9,7 +9,15 @@ import { useClickOutside } from "@mantine/hooks";
 import { doNothing } from "../utilities";
 import { BiShow } from "react-icons/bi";
 
-export function BreedLinkCard({ breed, ignoreHidden = false }) {
+/**
+ * 
+ * @param {{
+ *  breed: import('../APIs/cats').Breed,
+ *  ignoreHidden?: boolean
+ * }} param0 
+ * @returns 
+ */
+export function BreedLinkCard({ breed, forHidden = false }) {
     const image = useBreedReferenceImage(breed?.reference_image_id);
     const [backupImage] = useBreedImageUrl(image === null ? breed?.id : undefined, 1);
     const imageUrl = useMemo(() => image?.url ?? backupImage?.url, [image, backupImage]);
@@ -20,8 +28,8 @@ export function BreedLinkCard({ breed, ignoreHidden = false }) {
     const clearEmphasizeHideButton = useCallback(() => emphasizeHideButton && setEmphasizeHideButton(false), [emphasizeHideButton]);
     const ref = useClickOutside(clearEmphasizeHideButton);
     const DisplayIcon = useMemo(() => {
-        return !ignoreHidden ? GrHide : BiShow;
-    }, [ignoreHidden]);
+        return !forHidden ? GrHide : BiShow;
+    }, [forHidden]);
 
     const hideButtonSx = useMemo(() => {
         if (emphasizeHideButton) {
@@ -47,7 +55,7 @@ export function BreedLinkCard({ breed, ignoreHidden = false }) {
         }
     }, [emphasizeHideButton]);
 
-    if (isHidden && !ignoreHidden) {
+    if (isHidden && !forHidden) {
         return null;
     }
 
@@ -56,7 +64,7 @@ export function BreedLinkCard({ breed, ignoreHidden = false }) {
         event.stopPropagation();
 
         if (emphasizeHideButton) {
-            const action = ignoreHidden ? show : hide;
+            const action = forHidden ? show : hide;
             action();
             setEmphasizeHideButton(false);
         } else {
@@ -115,7 +123,7 @@ export function BreedLinkCard({ breed, ignoreHidden = false }) {
                 {emphasizeHideButton && <Space onClick={doNothing} h='100%' w='100%' sx={{ position: 'absolute', top: 0, left: 0, background: '#00000050' }} />}
             </Card.Section>
         </Card>
-        <ActionIcon onClick={onClickHideButton} size='lg' bg={`${theme.colors[ignoreHidden ? 'blue' : 'red'][6]}70`} variant="filled" radius='md' sx={[hideButtonSx, { position: 'absolute', transition: '0.2s', zIndex: 1, backdropFilter: 'blur(3px)', path: { stroke: 'white' } }]}>
+        <ActionIcon onClick={onClickHideButton} size='lg' bg={`${theme.colors[forHidden ? 'blue' : 'red'][6]}70`} variant="filled" radius='md' sx={[hideButtonSx, { position: 'absolute', transition: '0.2s', zIndex: 1, backdropFilter: 'blur(3px)', path: { stroke: 'white' } }]}>
             <DisplayIcon fontSize='1.2rem' color="white" />
         </ActionIcon>
     </Box >
