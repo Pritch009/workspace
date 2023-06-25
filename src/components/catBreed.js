@@ -281,13 +281,13 @@ export function CatBreed() {
               initial='hidden'
               animate='visible'
               variants={GridVariants}
-              sx={{ width: '100%', maxWidth: rem(1000), margin: '0 auto' }}
+              sx={{ width: '100%', maxWidth: rem(1000), margin: '0 auto', padding: 0 }}
             >
               <Grid.Col span={12}>
                 {title}
               </Grid.Col>
               <Grid.Col xs={12} sx={{ width: '100%', display: 'flex', flexDirection: "column", alignItems: emphasizeImage ? 'center' : 'start', gap: rem(16) }}>
-                <Grid w='100%'>
+                <Grid>
                   <Grid.Col
                     {...(emphasizeImage ? { xs: 12 } : { xs: 12, sm: 6, md: 5 })}
                     sx={{ display: 'flex', flexDirection: "column", alignItems: 'start' }}
