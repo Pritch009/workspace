@@ -1,8 +1,8 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ActionIcon, Box, Button } from "@mantine/core";
 import { MdArrowBack } from "react-icons/md";
 import { useViewportSize } from "@mantine/hooks";
-import { doNothing } from "../utilities";
+import { useMemo } from "react";
 
 /**
  * Since this is only 2 pages (browse and view breed),

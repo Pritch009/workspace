@@ -103,6 +103,7 @@ const attributes = {
 };
 
 const MotionCard = motion(Card);
+const MotionBox = motion(Box);
 
 const KnownForBadgeVariants = {
     hidden: {
@@ -211,10 +212,27 @@ export function BreedKnownFors({ breed }) {
     }, [breed]);
 
     return (
-        <Box p={rem(16)} sx={{ display: 'flex', flexDirection: 'row', width: "100%", boxSizing: "border-box", justifyContent: 'center', alignItems: 'center', gap: rem(16), flexWrap: 'wrap' }}>
+        <MotionBox variants={CardVariants} p={rem(16)} sx={{ display: 'flex', flexDirection: 'row', width: "100%", boxSizing: "border-box", justifyContent: 'center', alignItems: 'center', gap: rem(16), flexWrap: 'wrap' }}>
             {values}
-        </Box >
+        </MotionBox>
     );
+}
+
+const CardVariants = {
+    hidden: {
+        opacity: 0,
+        y: 10
+    },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            type: 'spring',
+            damping: 20,
+            stiffness: 100,
+            duration: 1
+        }
+    },
 }
 
 const AttributeOrder = {

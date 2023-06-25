@@ -63,6 +63,7 @@ export function SimilarBreeds({ to }) {
 
     return (
         <Box
+            pt={rem(32)}
             sx={{
                 boxSizing: 'border-box',
                 width: '100%',
@@ -72,15 +73,15 @@ export function SimilarBreeds({ to }) {
                 }
             }}
         >
-            <Title order={4} maw={rem(1000)} mx='auto'>Similar Breeds</Title>
+            <Title order={3} maw={rem(1000)} mx='auto'>Similar Breeds</Title>
             <Flex
-                py={rem(32)}
+                pb={rem(64)}
                 w='100%'
                 sx={{
                     overflow: 'auto'
                 }}
             >
-                <Flex wrap='nowrap' gap='lg' h={200} justify='start' align='center' mx='auto'>
+                <Flex wrap='nowrap' gap='lg' h={200} justify='start' align='center' mx='auto' px={rem(16)}>
                     {
                         topSimilar
                             .slice(0, 5)

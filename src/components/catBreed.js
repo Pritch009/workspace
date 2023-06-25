@@ -12,6 +12,7 @@ import {
   Stack,
   Space,
   Button,
+  Flex,
 } from "@mantine/core";
 import { useBreedImageUrl, useBreed, useBreedReferenceImage } from "../APIs/cats";
 import { BsWikipedia } from "react-icons/bs";
@@ -29,7 +30,6 @@ import { TraitBadge } from "./traitBadge";
 import { IconLink, LinkLogo } from "./iconLink";
 import { GoBackButton } from "./goBackButton";
 import { AnimatePresence, motion } from "framer-motion/dist/framer-motion";
-import { useCoupledState } from "../hooks/useCoupledState";
 import { useClickOutside } from "@mantine/hooks";
 
 const TraitBadges = [
@@ -99,7 +99,7 @@ const CardVariants = {
 const CardMotionProps = {
   // initial: 'hidden',
   // whileInView: 'visible',
-  variants: CardVariants,
+  variants: CardVariants
 }
 
 /**
@@ -152,16 +152,15 @@ export function CatBreed() {
   /// Links for learning more on other sites
   const learnMoreLinks = (
     breed && (
-      <MotionBox
-        key='learn_more_links'
-        {...CardMotionProps}
-        sx={{ display: 'flex', alignItems: 'center', gap: rem(16), justifyContent: 'center', overflow: 'visible', flexWrap: 'wrap' }}
+      <Box
+        key={`links_${breed?.id}`}
+        style={{ display: 'flex', alignItems: 'center', gap: rem(16), justifyContent: 'center', overflow: 'visible', flexWrap: 'wrap' }}
       >
-        {breed?.wikipedia_url && <IconLink Icon={BsWikipedia} href={breed.wikipedia_url} label="Learn more on Wikipedia" />}
-        {breed?.vetstreet_url && <IconLink Icon={() => <LinkLogo src={VetstreetLogo} alt="Vetstreet" />} href={breed.vetstreet_url} label="Learn more on Vetstreet" />}
-        {breed?.vcahospitals_url && <IconLink Icon={() => <LinkLogo src={VcaLogo} alt="VCA Hospitals logo" />} href={breed.vcahospitals_url} label="Learn more on VCA Hospitals" />}
-        {breed?.cfa_url && <IconLink Icon={() => <LinkLogo src={CfaLogo} alt="CFA Logo" style={{ filter: "invert(1)" }} />} href={breed.cfa_url} label="Learn more on CFA" />}
-      </MotionBox>
+        {breed?.wikipedia_url && <IconLink {...CardMotionProps} Icon={BsWikipedia} href={breed.wikipedia_url} label="Learn more on Wikipedia" />}
+        {breed?.vetstreet_url && <IconLink {...CardMotionProps} Icon={() => <LinkLogo src={VetstreetLogo} alt="Vetstreet" />} href={breed.vetstreet_url} label="Learn more on Vetstreet" />}
+        {breed?.vcahospitals_url && <IconLink {...CardMotionProps} Icon={() => <LinkLogo src={VcaLogo} alt="VCA Hospitals logo" />} href={breed.vcahospitals_url} label="Learn more on VCA Hospitals" />}
+        {breed?.cfa_url && <IconLink {...CardMotionProps} Icon={() => <LinkLogo src={CfaLogo} alt="CFA Logo" style={{ filter: "invert(1)" }} />} href={breed.cfa_url} label="Learn more on CFA" />}
+      </Box>
     )
   );
 
@@ -271,9 +270,6 @@ export function CatBreed() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          paddingLeft: rem(16),
-          paddingRight: rem(16),
-          paddingBottom: rem(48),
           overflow: 'hidden',
         }}
       >
@@ -334,15 +330,15 @@ export function CatBreed() {
                       {description}
                       {temperament}
                       {knownFor}
+                      <Stack sx={{ flex: '1 1 auto' }} justify='end'>
+                        {learnMoreLinks}
+                      </Stack>
                     </Grid.Col>
                   }
                 </Grid>
               </Grid.Col>
             </MotionGrid>
           )}
-          <Box py={rem(32)}>
-            {learnMoreLinks}
-          </Box>
           <SimilarBreeds key='similar' to={breed} />
         </AnimatePresence>
       </Box>
