@@ -24,7 +24,6 @@ export function FilterModal() {
 
     const count = useMemo(() => {
         const numKeys = Object.keys(filterState).filter((field) => field && field.localeCompare('country_code') !== 0).length;
-        console.log(numKeys, filterState);
         if (numKeys === 0) {
             return null;
         }
@@ -51,7 +50,7 @@ export function FilterModal() {
                         })
                     }
                 </Grid>
-                <Space h={rem(16)} />
+                <Space h={16} />
                 <Stack align='end'>
                     <Button onClick={closeFilter}>Close</Button>
                 </Stack>

@@ -1,5 +1,5 @@
 import { ActionIcon, Card, Space, Text, useMantineTheme, Box, rem } from "@mantine/core";
-import { useBreedImageUrl } from "../APIs/cats";
+import { useBreedImageUrl, useBreedReferenceImage } from "../APIs/cats";
 import { Link } from "react-router-dom";
 import { EmptyBreedImage } from "./emptyBreedImage";
 import { GrHide } from "react-icons/gr";
@@ -10,7 +10,7 @@ import { doNothing } from "../utilities";
 import { BiShow } from "react-icons/bi";
 
 export function BreedLinkCard({ breed, ignoreHidden = false }) {
-    const [image] = useBreedImageUrl(breed.id);
+    const image = useBreedReferenceImage(breed?.reference_image_id);
     const theme = useMantineTheme();
     const [emphasizeHideButton, setEmphasizeHideButton] = useState(false);
     const { isHidden, hide, show } = useIsHidden(breed);
@@ -74,7 +74,7 @@ export function BreedLinkCard({ breed, ignoreHidden = false }) {
             }}>
                 {image?.url && (
                     <img
-                        src={image.url}
+                        src={image?.url}
                         loading='lazy'
                         alt={`Image of ${breed?.name} cat.`}
                         style={{
@@ -86,9 +86,25 @@ export function BreedLinkCard({ breed, ignoreHidden = false }) {
                 {!image?.url && (
                     <EmptyBreedImage />
                 )}
-                <Text sx={{ width: '100%', textAlign: 'center', position: 'absolute', bottom: 0, left: 0, zIndex: 1, background: '#ffffffA0', backdropFilter: 'blur(3px)' }}>{breed?.name}</Text>
+                <Text
+                    sx={{
+                        minWidth: '100%',
+                        width: 'fit-content',
+                        maxWidth: '100%',
+                        textAlign: 'center',
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        zIndex: 1,
+                        background: '#ffffffA0',
+                        backdropFilter: 'blur(3px)',
+                        lineClamp: 1,
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                    }}>
+                    {breed?.name}
+                </Text>
                 {emphasizeHideButton && <Space onClick={doNothing} h='100%' w='100%' sx={{ position: 'absolute', top: 0, left: 0, background: '#00000050' }} />}
-
             </Card.Section>
         </Card>
         <ActionIcon onClick={onClickHideButton} size='lg' bg={`${theme.colors[ignoreHidden ? 'blue' : 'red'][6]}70`} variant="filled" radius='md' sx={[hideButtonSx, { position: 'absolute', transition: '0.2s', zIndex: 1, backdropFilter: 'blur(3px)', path: { stroke: 'white' } }]}>

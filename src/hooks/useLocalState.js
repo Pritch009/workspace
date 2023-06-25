@@ -20,7 +20,6 @@ export function useLocalState(key, defaultValue, parse = (val) => val) {
     const [state, setState] = useState(localState);
 
     const setLocalState = (action) => {
-        console.log('setLocalState', action);
         setState((prevState) => {
             let newValue;
             if (typeof action === 'function') {

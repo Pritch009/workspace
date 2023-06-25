@@ -1,10 +1,10 @@
-import { ActionIcon, Box, Button, Flex, Modal, rem } from "@mantine/core";
+import { Box, Button, Flex, Modal, rem } from "@mantine/core";
 import { useHideContext } from "../contexts/hideContext";
 import { useEffect, useMemo, useState } from "react";
 import { BreedLinkCard } from "./breedLinkCard";
 
 export function HiddenModal() {
-    const [hidden, setHidden] = useHideContext();
+    const [hidden] = useHideContext();
     const [opened, setOpened] = useState(false);
 
     const someHidden = useMemo(() => hidden.size > 0, [hidden]);

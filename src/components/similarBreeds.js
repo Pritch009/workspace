@@ -4,13 +4,21 @@ import similarity from "compute-cosine-similarity";
 import { useMemo } from "react";
 import { pick } from "../utilities";
 import { BreedLinkCard } from "./breedLinkCard";
-import { useFilter } from "../contexts/filterContext";
 import { useHideContext } from "../contexts/hideContext";
 
 const SimilarityFields = ["hairless", "adaptability", "affection_level", "child_friendly", "dog_friendly", "energy_level", "grooming", "health_issues", "intelligence", "shedding_level", "social_needs", "stranger_friendly", "vocalisation"];
 const BooleanFields = ["hairless", "rare", "suppressed_tail", "short_legs", "hypoallergenic", "experimental", "natural"];
 const BooleanFieldWeights = [20, 5, 10, 20, 5, 10, 1];
 
+/**
+ * @typedef {import('../APIs/cats').Breed} Breed
+ */
+
+/**
+ * Extracts the values needed to perform a comparison from a breed object.
+ * @param {Breed} breed 
+ * @returns {number[]} 
+ */
 function extractComparisonVector(breed) {
     return [
         Object.values(pick(breed, BooleanFields.flat())).map((val, index) => val === undefined ? 0 : val * BooleanFieldWeights[index]),
@@ -18,6 +26,16 @@ function extractComparisonVector(breed) {
     ].flat()
 }
 
+/**
+ * @typedef SimilarBreedsProps
+ * @property {Breed} to
+ */
+
+/**
+ * 
+ * @param {SimilarBreedsProps} props 
+ * @returns {JSX.Element}
+ */
 export function SimilarBreeds({ to }) {
     const breeds = useBreeds();
     const [hidden] = useHideContext();
@@ -56,12 +74,11 @@ export function SimilarBreeds({ to }) {
             <Flex
                 py={rem(32)}
                 w='100%'
-                justify='center'
                 sx={{
                     overflow: 'auto'
                 }}
             >
-                <Flex wrap='nowrap' gap='lg' h={200} justify='start' align='center'                >
+                <Flex wrap='nowrap' gap='lg' h={200} justify='start' align='center' mx='auto'>
                     {
                         topSimilar
                             .slice(0, 5)

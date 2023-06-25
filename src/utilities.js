@@ -11,3 +11,7 @@ export function doNothing(event) {
     event?.preventDefault?.();
     event?.stopPropagation?.();
 }
+
+export function isNotEmptyString(str) {
+    return typeof str === 'string' && str.length > 0;
+}

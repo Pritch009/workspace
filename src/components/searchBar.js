@@ -43,9 +43,23 @@ export function SearchBar() {
   const { data: breeds, loading: loadingBreeds, error } = useBreeds();
   const [err, setErr] = useState(null);
   const [searchValue, setSearchValue] = useState("");
-  const [sortFn, setSortFn] = useState('Relevancy');
   const [suggestions, setSuggestions] = useState([]);
-  const [pageSize, setPageSize] = useState(PageSizeOptions[1]);
+  const [sortFn, setSortFn] = useLocalState(
+    '',
+    'Relevancy',
+    (value) => (typeof value === 'string') ? value : null
+  );
+  const [pageSize, setPageSize] = useLocalState(
+    'cats.browse.pageSize',
+    PageSizeOptions[1],
+    (value) => {
+      const parsed = parseInt(value);
+      if (isNaN(parsed)) {
+        return null;
+      }
+      return parsed;
+    }
+  );
   const [page, setPage] = useState(0);
   const [filter] = useFilter();
 
@@ -152,12 +166,11 @@ export function SearchBar() {
                   {suggestionWindow
                     .map(({ breed: suggestion }, index) => (
                       <Grid.Col
-                        span="auto"
+                        span={6}
+                        xs='auto'
                         key={suggestion.id}
                         sx={{
-                          flex: '1 0 auto',
-                          minWidth: rem(170),
-                          maxWidth: rem(242),
+                          flex: `1 0 ${rem(242)}`,
                           aspectRatio: '1/1',
                           '&:empty': {
                             display: 'none',
@@ -179,6 +192,10 @@ export function SearchBar() {
                         page={page + 1}
                         onChange={onSetPage}
                         total={numPages}
+                        siblings={2}
+                        color='blue'
+                        radius='md'
+                        withControls={false}
                       />
                     </Flex>
                   )
@@ -233,32 +250,9 @@ function SortBySelector({ currentValue, onChange }) {
 
 const PageSizeOptions = [5, 10, 25, 50, 100];
 function PageSizeSelector({ currentValue, onChange }) {
-  const [localState, setLocalState] = useLocalState(
-    'cats.browse.pageSize',
-    currentValue,
-    (value) => {
-      const parsed = parseInt(value);
-      if (isNaN(parsed)) {
-        return null;
-      }
-      return parsed;
-    }
-  );
-
-  useCoupledState(
-    currentValue,
-    setLocalState
-  );
-
-  useEffect(() => {
-    if (localState !== null) {
-      onChange(localState);
-    }
-  }, []);
-
   return <Select
     w='fit-content'
-    value={localState}
+    value={currentValue}
     onChange={onChange}
     label='Page Size'
     data={
