@@ -167,7 +167,7 @@ export function BreedKnownFors({ breed }) {
 
             const element = display && (
                 <MotionCard
-                    key={key}
+                    key={`${breed?.id}_${key}`}
                     variants={KnownForBadgeVariants}
                     py={rem(8)}
                     sx={{
@@ -183,7 +183,7 @@ export function BreedKnownFors({ breed }) {
                 </MotionCard>
             );
 
-            return [key, element];
+            return element;
         };
 
         const allowed = values
@@ -212,13 +212,7 @@ export function BreedKnownFors({ breed }) {
 
     return (
         <Box p={rem(16)} sx={{ display: 'flex', flexDirection: 'row', width: "100%", boxSizing: "border-box", justifyContent: 'center', alignItems: 'center', gap: rem(16), flexWrap: 'wrap' }}>
-            {
-                values.map(([key, value]) => (
-                    <Fragment key={key}>
-                        {value}
-                    </Fragment>
-                ))
-            }
+            {values}
         </Box >
     );
 }

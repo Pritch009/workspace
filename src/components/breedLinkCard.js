@@ -18,10 +18,9 @@ import { BiShow } from "react-icons/bi";
  * @returns 
  */
 export function BreedLinkCard({ breed, forHidden = false }) {
-    const image = useBreedReferenceImage(breed?.reference_image_id);
-    const [backupImage] = useBreedImageUrl(image === null ? breed?.id : undefined, 1);
-    const imageUrl = useMemo(() => image?.url ?? backupImage?.url, [image, backupImage]);
-    const loadingImage = useMemo(() => imageUrl === undefined && backupImage === undefined, [image, backupImage]);
+    const image = useBreedReferenceImage(breed);
+    const loadingImage = useMemo(() => image === undefined, [image]);
+    const imageUrl = useMemo(() => image?.url, [image]);
     const theme = useMantineTheme();
     const [emphasizeHideButton, setEmphasizeHideButton] = useState(false);
     const { isHidden, hide, show } = useIsHidden(breed);
@@ -83,7 +82,7 @@ export function BreedLinkCard({ breed, forHidden = false }) {
                     width: '100%',
                 }
             }}>
-                {loadingImage && (
+                {loadingImage && !imageUrl && (
                     <Skeleton
                         sx={{ position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
                     />

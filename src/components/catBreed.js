@@ -54,14 +54,12 @@ const MotionCarouselSlide = motion(Carousel.Slide);
 
 const CarouselVariants = {
   hidden: {
-    opacity: 0,
-    zIndex: 0,
+    zIndex: 1,
     transition: {
-      duration: 0.25,
+      duration: 0.001,
     }
   },
   visible: {
-    opacity: 1,
     zIndex: 10,
     transition: {
       duration: 0.25,
@@ -112,14 +110,37 @@ export function CatBreed() {
   const { breedId } = useParams();
   const { breed, error } = useBreed(breedId);
   const [emphasizeImage, setEmphasizeImage] = useState(false);
-  const [carouselIndex, onChangeIndex] = useState(0);
+  const imagesUrls = useBreedImageUrl(breed?.id, 5);
+  const referenceImage = useBreedReferenceImage(breed);
+  const [carouselIndex, setCarouselIndex] = useState(0);
 
   const onToggleImageEmphasis = (event) => {
     setEmphasizeImage((prev) => !prev);
   }
 
+
+  const images = useMemo(() => {
+    if (!breed) return null;
+
+    const imagesMap = {};
+    for (const image of [referenceImage, imagesUrls].flat().filter(Boolean)) {
+      if (image && image?.id) {
+        imagesMap[image.id] = image;
+      }
+    }
+    const images = Object.values(imagesMap);
+    return <ImageCarousel
+      images={images}
+      index={breed?.id === breedId ? carouselIndex : 0}
+      setCarouselIndex={setCarouselIndex}
+      onDoubleClick={onToggleImageEmphasis}
+      emphasized={emphasizeImage}
+    />
+  }, [imagesUrls, referenceImage, emphasizeImage, breed?.id]);
+
   /// Effect to scroll to top when breed changes
   useEffect(() => {
+    setCarouselIndex(0);
     setTimeout(() => {
       window.scrollTo({
         top: 0,
@@ -149,7 +170,7 @@ export function CatBreed() {
 
   /// Description section
   const description = (
-    isNotEmptyString(breed?.description) && <MotionCard key='description' {...CardMotionProps} shadow="md" radius='lg' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
+    isNotEmptyString(breed?.description) && <MotionCard key={`description_${breed?.id}`} {...CardMotionProps} shadow="md" radius='lg' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Description</Text>
         <Text size='md' weight='normal'>{breed?.description}</Text>
@@ -159,7 +180,7 @@ export function CatBreed() {
 
   /// Also known as section
   const alsoKnownAs = (
-    isNotEmptyString(breed?.alt_names) && <MotionCard key='alt_names' {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
+    isNotEmptyString(breed?.alt_names) && <MotionCard key={`alt_names_${breed?.id}`} {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Also known as</Text>
         <Text size='md' weight='normal' transform="capitalize">{breed?.alt_names}</Text>
@@ -169,7 +190,7 @@ export function CatBreed() {
 
   /// Temperament section
   const temperament = (
-    isNotEmptyString(breed?.temperament) && <MotionCard key='temperament' {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
+    isNotEmptyString(breed?.temperament) && <MotionCard key={`temperament_${breed?.id}`} {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Temperament</Text>
         <Text size='md' weight='normal'>{breed?.temperament}</Text>
@@ -179,7 +200,7 @@ export function CatBreed() {
 
   /// Lifespan section
   const lifeSpan = (
-    isNotEmptyString(breed?.life_span) && <MotionCard key='life_span' {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
+    isNotEmptyString(breed?.life_span) && <MotionCard key={`life_span_${breed?.id}`} {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Life Span</Text>
         <Text size='md' italic weight='normal'>{breed?.life_span} years</Text>
@@ -189,7 +210,7 @@ export function CatBreed() {
 
   /// Weight in standard units section
   const weightInStandard = (
-    isNotEmptyString(breed?.weight.imperial) && <MotionCard key='weight' {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
+    isNotEmptyString(breed?.weight.imperial) && <MotionCard key={`weight_${breed?.id}`} {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Weight</Text>
         <Text size='md' italic weight='normal'>{breed?.weight.imperial} lbs</Text>
@@ -200,15 +221,22 @@ export function CatBreed() {
   /// Badges section
   const badges = (
     breed && <Box py={rem(16)} sx={{ display: 'flex', flexWrap: 'wrap', width: '100%', gap: rem(8), justifyContent: 'center' }}>
-      <MotionBadge key='origin_badge' {...CardMotionProps} variant="outline" color='gray' size="lg" leftSection={<NationalFlag countryCode={breed?.country_code} />}>
+      <MotionBadge key={`origin_${breed?.id}`} {...CardMotionProps} variant="outline" color='gray' size="lg" leftSection={<NationalFlag countryCode={breed?.country_code} />}>
         {breed?.origin ?? 'Unknown'}
       </MotionBadge>
       {
-        TraitBadges.map(({ field, color, display, icon, hint }) => (
-          <Tooltip key={field} label={hint} sx={{ '&:empty': { display: 'none' } }}>
-            <MotionTraitBadge key={`trait_${field}`} {...CardMotionProps} value={breed[field]} color={color} display={display} leftSection={icon} />
+        TraitBadges.map(({ field, color, display, icon, hint, invert = false }) => {
+          const value = field in breed && breed[field] === (Boolean(invert) ? 0 : 1);
+          if (!value) {
+            return null;
+          }
+
+          return <Tooltip key={field} label={hint} sx={{ '&:empty': { display: 'none' } }}>
+            <MotionBox key={`trait_${field}_${breed?.id}`} {...CardMotionProps} >
+              <TraitBadge color={color} display={display} leftSection={icon} />
+            </MotionBox>
           </Tooltip>
-        ))
+        })
       }
     </Box>
   );
@@ -234,40 +262,6 @@ export function CatBreed() {
     </Box>
   );
 
-  const imagesUrls = useBreedImageUrl(breed?.id, 5);
-  const referenceImage = useBreedReferenceImage(breed?.reference_image_id);
-  const images = useMemo(() => {
-    const images = {};
-    for (const image of [referenceImage, imagesUrls].flat().filter(Boolean)) {
-      if (image && image?.id) {
-        images[image.id] = image;
-      }
-    }
-    return Object.values(images);
-  }, [imagesUrls, referenceImage]);
-
-  /// Image section
-  const carousel = breed && <Card
-    key='carousel'
-    radius='lg'
-    shadow="md"
-    sx={{
-      position: 'relative',
-      width: '100%',
-      alignItems: 'start',
-      aspectRatio: '1 / 1',
-    }}
-  >
-    <Card.Section>
-      <ImageCarousel
-        images={images}
-        onDoubleClick={onToggleImageEmphasis}
-        emphasized={emphasizeImage}
-        carouselIndex={carouselIndex}
-        onChangeIndex={onChangeIndex}
-      />
-    </Card.Section>
-  </Card>;
 
   return (
     <>
@@ -287,7 +281,7 @@ export function CatBreed() {
         <AnimatePresence>
           {breed && (
             <MotionGrid
-              key={breed.id}
+              key='breed'
               initial='hidden'
               animate='visible'
               variants={GridVariants}
@@ -298,10 +292,27 @@ export function CatBreed() {
               </Grid.Col>
               <Grid.Col xs={12} sx={{ width: '100%', display: 'flex', flexDirection: "column", alignItems: emphasizeImage ? 'center' : 'start', gap: rem(16) }}>
                 <Grid w='100%'>
-                  <Grid.Col {...(emphasizeImage ? { xs: 12 } : { xs: 12, sm: 6, md: 5 })} sx={{ display: 'flex', flexDirection: "column", alignItems: 'start' }}>
+                  <Grid.Col
+                    {...(emphasizeImage ? { xs: 12 } : { xs: 12, sm: 6, md: 5 })}
+                    sx={{ display: 'flex', flexDirection: "column", alignItems: 'start' }}
+                  >
                     <Grid gutter='none' grow sx={{ width: '100%', margin: '0 auto' }}>
                       <Grid.Col span={12}>
-                        {carousel}
+                        <Card
+                          key={`carousel_${breed?.id}`}
+                          radius='lg'
+                          shadow="md"
+                          sx={{
+                            position: 'relative',
+                            width: '100%',
+                            alignItems: 'start',
+                            aspectRatio: '1 / 1',
+                          }}
+                        >
+                          <Card.Section>
+                            {images}
+                          </Card.Section>
+                        </Card>
                         {badges}
                       </Grid.Col>
                       <Grid.Col>
@@ -318,20 +329,21 @@ export function CatBreed() {
                   </Grid.Col>
 
                   {
-                    !emphasizeImage && <Grid.Col xs={12} sm='auto' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
+                    !emphasizeImage && <Grid.Col key='content' xs={12} sm='auto' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
                       {alsoKnownAs}
                       {description}
                       {temperament}
                       {knownFor}
-                      <Space sx={{ flex: '1 1 auto' }} />
-                      {learnMoreLinks}
                     </Grid.Col>
                   }
                 </Grid>
               </Grid.Col>
             </MotionGrid>
           )}
-          <SimilarBreeds to={breed} />
+          <Box py={rem(32)}>
+            {learnMoreLinks}
+          </Box>
+          <SimilarBreeds key='similar' to={breed} />
         </AnimatePresence>
       </Box>
     </>
@@ -341,41 +353,58 @@ export function CatBreed() {
 /**
  * Image Carousel for a given breed
  * @param {{
- *   breed: import('../APIs/cats').Breed,
- *   imagesUrls: string[],
+ *   images: { url: string, id: string }[],
  *   referenceImage: import('../APIs/cats').BreedImage,
- *   emphasized: boolean,
- *   carouselIndex: number,
- *   onChangeIndex: (index: number) => void,
+ *   emphasized: boolean
  * }} props  
  * @returns {JSX.Element}
  */
-function ImageCarousel({ images, onDoubleClick, emphasized, carouselIndex, onChangeIndex }) {
+function ImageCarousel({ images, onDoubleClick, emphasized, index, setCarouselIndex }) {
   const ref = useClickOutside(() => {
     if (emphasized) {
       onDoubleClick();
     }
   });
 
-  const initialSlide = useMemo(() => carouselIndex, [emphasized]);
-
   /// Carousel Images
   const imageElements = useMemo(() => {
-    return Object.values(images).map((image) => (
-      <img
-        key={image.id}
-        src={image.url}
-        alt={image.alt}
-        loading='eager'
-        style={{
-          objectFit: "cover",
+    const values = Object.values(images);
+    const numImages = values.length;
+    return values.map((image, index) => (
+      <Carousel.Slide
+        key={`img_${image.id}`}
+        variants={CarouselVariants}
+        onDoubleClick={onDoubleClick}
+        layout
+        exit='hidden'
+        sx={{
+          display: 'block',
           height: '100%',
           width: '100%',
-          position: 'absolute',
+          position: 'relative',
         }}
-      />
+      >
+        <motion.img
+          initial={{
+            opacity: 0
+          }}
+          whileInView={{
+            opacity: 1
+          }}
+          key={`image_${index}`}
+          src={image.url}
+          alt={image.alt}
+          style={{
+            objectFit: "cover",
+            height: '100%',
+            width: '100%',
+            position: 'absolute',
+            zIndex: (numImages - index + 1)
+          }}
+        />
+      </Carousel.Slide>
     ))
-  }, [images, emphasized]);
+  }, [images]);
 
   return useMemo(() => (
     images.length > 0 ? (
@@ -383,11 +412,9 @@ function ImageCarousel({ images, onDoubleClick, emphasized, carouselIndex, onCha
         loop
         ref={emphasized ? ref : null}
         key={`carousel_${emphasized}`}
+        onSlideChange={setCarouselIndex}
+        initialSlide={index}
         withIndicators
-        onNextSlide={() => onChangeIndex((prev) => (prev + 1) % images.length)}
-        onPreviousSlide={() => onChangeIndex((prev) => (prev - 1 + images.length) % images.length)}
-        initialSlide={initialSlide}
-        setCarouselIndex={onChangeIndex}
         sx={{
           width: '100%',
           height: '100%',
@@ -404,25 +431,10 @@ function ImageCarousel({ images, onDoubleClick, emphasized, carouselIndex, onCha
           }
         }}
       >
-        {imageElements.map((image, index) => (
-          <MotionCarouselSlide
-            variants={CarouselVariants}
-            onDoubleClick={onDoubleClick}
-            exit='hidden'
-            key={`img_${index}`}
-            sx={{
-              display: 'block',
-              height: '100%',
-              width: '100%',
-              position: 'relative',
-            }}
-          >
-            {image}
-          </MotionCarouselSlide>
-        ))}
+        {imageElements}
       </Carousel>
     ) : <Stack align="center" justify="center" h='100%' w='100%' sx={{ aspectRatio: '1/1' }}>
       <EmptyBreedImage />
     </Stack>
-  ), [imageElements, emphasized, carouselIndex]);
+  ), [imageElements, emphasized]);
 }

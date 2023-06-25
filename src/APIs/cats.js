@@ -139,33 +139,55 @@ export function useBreed(breedId) {
  * This image id is provided by the breed object.
  * 
  * This is also backed up to a call for any images of the breed should the reference id not work.
- * @param {string} reference_image_id 
+ * @param {Breed} breed`` 
  * @returns {{ url: string, id: string } | undefined | null}
  */
-export function useBreedReferenceImage(reference_image_id) {
-  const [state, setState] = useLocalState(`image.${reference_image_id}`, null);
-
-  const [{ data, loading }, fetch] = useAxios(
+export function useBreedReferenceImage(breed) {
+  const [state, setState] = useLocalState(breed?.reference_image_id ? `image.${breed.reference_image_id}` : undefined, null);
+  const [{ data: anyImage, loading: loadingAny }, fetchAny] = useAxios({
+    url: `https://api.thecatapi.com/v1/images/search?breed_id=${breed?.reference_image_id}`,
+    method: "GET",
+  }, { manual: true });
+  const [{ data: referenceImage, loading: loadingReference, error: referenceError }, fetchReference] = useAxios(
     {
-      url: `https://api.thecatapi.com/v1/images/${reference_image_id}`,
+      url: `https://api.thecatapi.com/v1/images/${breed?.reference_image_id}`,
       method: "GET",
     },
     { manual: true, }
   );
 
+  // If the breed changes, reset the state
   useEffect(() => {
-    if (reference_image_id && !state || state?.id !== reference_image_id) {
-      fetch().catch(() => { });
+    if (breed?.reference_image_id && !state || state?.id !== breed?.reference_image_id) {
+      fetchReference().catch(() => { });
     }
-  }, [reference_image_id]);
+  }, [breed?.reference_image_id]);
 
+  // If the reference image fails, try any image
   useEffect(() => {
-    if (data) {
-      setState(pick(data, ['url', 'id']));
+    if (referenceError) {
+      fetchAny().catch(() => { });
     }
-  }, [data]);
+  }, [referenceError])
 
-  return loading ? undefined : (state ?? null);
+  // If the reference image succeeds
+  useEffect(() => {
+    if (referenceImage) {
+      setState(pick(referenceImage, ['url', 'id']));
+    }
+  }, [referenceImage]);
+
+  // when the reference image fails, but any image succeeds
+  useEffect(() => {
+    if (anyImage) {
+      let [first] = anyImage;
+      if (first) {
+        setState(pick(first, ['url', 'id']));
+      }
+    }
+  }, [anyImage]);
+
+  return (loadingAny || loadingReference) ? undefined : (state ?? null);
 }
 
 /**

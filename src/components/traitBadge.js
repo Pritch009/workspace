@@ -18,12 +18,7 @@ import { forwardRef } from 'react';
  * @returns {JSX.Element}
  */
 export const TraitBadge = forwardRef(
-    function TraitBadge({ value: _value, color, display, invert = false, leftSection }, ref) {
-        const value = _value && _value === (Boolean(invert) ? 0 : 1);
-        if (!value) {
-            return null;
-        }
-
+    function TraitBadge({ color, display, leftSection }, ref) {
         return <Badge ref={ref} size='lg' leftSection={leftSection} styles={{ leftSection: { display: 'flex' } }} color={color}>
             {display}
         </Badge>

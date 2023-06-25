@@ -15,7 +15,7 @@ import { useMemo, useState } from "react";
 export function useLocalState(key, defaultValue, parse = (val) => val) {
     const localState = useMemo(() => {
         try {
-            let val = localStorage.getItem(key);
+            let val = key ? localStorage.getItem(key) : null;
             if (val !== null) {
                 val = parse(JSON.parse(val));
             }
@@ -28,7 +28,7 @@ export function useLocalState(key, defaultValue, parse = (val) => val) {
         }
 
         return defaultValue;
-    }, []);
+    }, [key]);
     const [state, setState] = useState(localState);
 
     const setLocalState = (action) => {

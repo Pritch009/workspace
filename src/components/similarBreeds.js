@@ -84,7 +84,7 @@ export function SimilarBreeds({ to }) {
                     {
                         topSimilar
                             .slice(0, 5)
-                            .map(([_, breed]) => (
+                            .map(([_, breed], index) => (
                                 <MotionBox
                                     variants={{
                                         hidden: {
@@ -102,8 +102,11 @@ export function SimilarBreeds({ to }) {
                                     }}
                                     initial='hidden'
                                     whileInView='visible'
+                                    viewport={{
+                                        once: true
+                                    }}
                                     exit='exit'
-                                    key={breed.id}
+                                    key={`${to?.id}-${index}`}
                                     sx={{ height: 200, width: 200, '&:empty': { display: "none" } }}
                                 >
                                     <BreedLinkCard breed={breed} />

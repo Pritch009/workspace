@@ -33,8 +33,7 @@ const BreedCardVariants = (index) => ({
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.5,
-      delay: index * 0.05,
+      duration: 0.3,
     }
   }
 });
@@ -203,7 +202,10 @@ export function SearchBar() {
                         .map(({ breed: suggestion }, index) => (
                           <MotionGridCol
                             initial='hidden'
-                            animate='visible'
+                            whileInView='visible'
+                            viewport={{
+                              once: true
+                            }}
                             variants={BreedCardVariants(index)}
                             key={suggestion.id}
                             span={6}
