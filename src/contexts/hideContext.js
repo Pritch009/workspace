@@ -1,4 +1,5 @@
 import { useState, createContext, useContext } from "react";
+import { useLocalState } from "../hooks/useLocalState";
 
 const hideContext = createContext(null);
 
@@ -10,7 +11,17 @@ const hideContext = createContext(null);
  * @returns 
  */
 export function HideContext({ children }) {
-    const hideState = useState(new Map());
+    const hideState = useLocalState(
+        'cats.hidden',
+        new Map(),
+        (val) => {
+            console.log(val);
+            return typeof val === 'object' ? new Map(Object.entries(val)) : null;
+        },
+        (val) => {
+            return JSON.stringify(Object.fromEntries(val));
+        }
+    );
 
     return <hideContext.Provider value={hideState}>
         {children}

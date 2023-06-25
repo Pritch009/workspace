@@ -12,7 +12,7 @@ import { useMemo, useState } from "react";
  * @param {(value: any) => any} parse 
  * @returns 
  */
-export function useLocalState(key, defaultValue, parse = (val) => val) {
+export function useLocalState(key, defaultValue, parse = (val) => val, stringify = JSON.stringify) {
     const localState = useMemo(() => {
         try {
             let val = key ? localStorage.getItem(key) : null;
@@ -39,7 +39,7 @@ export function useLocalState(key, defaultValue, parse = (val) => val) {
             } else {
                 newValue = action;
             }
-            localStorage.setItem(key, JSON.stringify(newValue));
+            localStorage.setItem(key, stringify(newValue));
             return newValue;
         });
     }
