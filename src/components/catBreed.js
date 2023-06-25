@@ -13,6 +13,7 @@ import {
   Space,
   Button,
   Flex,
+  useMantineTheme,
 } from "@mantine/core";
 import { useBreedImageUrl, useBreed, useBreedReferenceImage } from "../APIs/cats";
 import { BsWikipedia } from "react-icons/bs";
@@ -30,7 +31,7 @@ import { TraitBadge } from "./traitBadge";
 import { IconLink, LinkLogo } from "./iconLink";
 import { GoBackButton } from "./goBackButton";
 import { AnimatePresence, motion } from "framer-motion/dist/framer-motion";
-import { useClickOutside } from "@mantine/hooks";
+import { useClickOutside, useViewportSize } from "@mantine/hooks";
 
 const TraitBadges = [
   { field: 'indoor', color: 'green', display: 'Indoor', hint: 'Indoor cats live best inside.' },
@@ -356,11 +357,24 @@ export function CatBreed() {
  * @returns {JSX.Element}
  */
 function ImageCarousel({ images, onDoubleClick, emphasized, index, setCarouselIndex }) {
+  const { width } = useViewportSize();
+  const theme = useMantineTheme();
+
+  const shouldEmphasize = useMemo(() => {
+    return emphasized && width > theme.breakpoints.sm;
+  }, [emphasized])
+
   const ref = useClickOutside(() => {
     if (emphasized) {
       onDoubleClick();
     }
   });
+
+  useEffect(() => {
+    if (emphasized && !shouldEmphasize) {
+      onDoubleClick();
+    }
+  }, [shouldEmphasize, emphasized])
 
   /// Carousel Images
   const imageElements = useMemo(() => {
@@ -406,8 +420,8 @@ function ImageCarousel({ images, onDoubleClick, emphasized, index, setCarouselIn
     images.length > 0 ? (
       <Carousel
         loop
-        ref={emphasized ? ref : null}
-        key={`carousel_${emphasized}`}
+        ref={shouldEmphasize ? ref : null}
+        key={`carousel_${shouldEmphasize}`}
         onSlideChange={setCarouselIndex}
         initialSlide={index}
         withIndicators
@@ -432,5 +446,5 @@ function ImageCarousel({ images, onDoubleClick, emphasized, index, setCarouselIn
     ) : <Stack align="center" justify="center" h='100%' w='100%' sx={{ aspectRatio: '1/1' }}>
       <EmptyBreedImage />
     </Stack>
-  ), [imageElements, emphasized]);
+  ), [imageElements, shouldEmphasize]);
 }
