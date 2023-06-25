@@ -167,7 +167,8 @@ export function SearchBar() {
                     .map(({ breed: suggestion }, index) => (
                       <Grid.Col
                         span={6}
-                        xs='auto'
+                        xs={4}
+                        sm={3}
                         key={suggestion.id}
                         sx={{
                           flex: `1 0 ${rem(242)}`,
@@ -192,7 +193,7 @@ export function SearchBar() {
                         page={page + 1}
                         onChange={onSetPage}
                         total={numPages}
-                        siblings={2}
+                        siblings={1}
                         color='blue'
                         radius='md'
                         withControls={false}
