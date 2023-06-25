@@ -1,4 +1,5 @@
 import { Badge } from '@mantine/core';
+import { forwardRef } from 'react';
 
 /**
  * @typedef TraitBadgeProps
@@ -16,13 +17,15 @@ import { Badge } from '@mantine/core';
  * @param {TraitBadgeProps} props 
  * @returns {JSX.Element}
  */
-export function TraitBadge({ value: _value, color, display, invert = false, leftSection }) {
-    const value = _value && _value === (Boolean(invert) ? 0 : 1);
-    if (!value) {
-        return null;
-    }
+export const TraitBadge = forwardRef(
+    function TraitBadge({ value: _value, color, display, invert = false, leftSection }, ref) {
+        const value = _value && _value === (Boolean(invert) ? 0 : 1);
+        if (!value) {
+            return null;
+        }
 
-    return <Badge size='lg' leftSection={leftSection} styles={{ leftSection: { display: 'flex' } }} color={color}>
-        {display}
-    </Badge>
-}
+        return <Badge ref={ref} size='lg' leftSection={leftSection} styles={{ leftSection: { display: 'flex' } }} color={color}>
+            {display}
+        </Badge>
+    }
+)

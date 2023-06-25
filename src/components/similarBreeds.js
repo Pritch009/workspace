@@ -5,6 +5,8 @@ import { useMemo } from "react";
 import { pick } from "../utilities";
 import { BreedLinkCard } from "./breedLinkCard";
 import { useHideContext } from "../contexts/hideContext";
+import { motion } from "framer-motion/dist/framer-motion";
+import { AnimatePresence } from "framer-motion/dist/framer-motion";
 
 const SimilarityFields = ["hairless", "adaptability", "affection_level", "child_friendly", "dog_friendly", "energy_level", "grooming", "health_issues", "intelligence", "shedding_level", "social_needs", "stranger_friendly", "vocalisation"];
 const BooleanFields = ["hairless", "rare", "suppressed_tail", "short_legs", "hypoallergenic", "experimental", "natural"];
@@ -83,9 +85,29 @@ export function SimilarBreeds({ to }) {
                         topSimilar
                             .slice(0, 5)
                             .map(([_, breed]) => (
-                                <Box key={breed.id} sx={{ height: 200, width: 200, '&:empty': { display: "none" } }}>
+                                <MotionBox
+                                    variants={{
+                                        hidden: {
+                                            opacity: 0,
+                                            y: 10
+                                        },
+                                        visible: {
+                                            opacity: 1,
+                                            y: 0
+                                        },
+                                        exit: {
+                                            opacity: 0,
+                                            y: -10
+                                        }
+                                    }}
+                                    initial='hidden'
+                                    whileInView='visible'
+                                    exit='exit'
+                                    key={breed.id}
+                                    sx={{ height: 200, width: 200, '&:empty': { display: "none" } }}
+                                >
                                     <BreedLinkCard breed={breed} />
-                                </Box>
+                                </MotionBox>
                             ))
                     }
                 </Flex>
@@ -93,3 +115,5 @@ export function SimilarBreeds({ to }) {
         </Box>
     )
 }
+
+const MotionBox = motion(Box);

@@ -12,7 +12,7 @@ import {
   Stack,
   Space,
 } from "@mantine/core";
-import { useBreedImageUrl, useBreed } from "../APIs/cats";
+import { useBreedImageUrl, useBreed, useBreedReferenceImage } from "../APIs/cats";
 import { BsWikipedia } from "react-icons/bs";
 import { useParams } from "react-router-dom";
 import { BreedKnownFors } from "./breedKnownFors";
@@ -27,6 +27,7 @@ import { isNotEmptyString } from "../utilities";
 import { TraitBadge } from "./traitBadge";
 import { IconLink, LinkLogo } from "./iconLink";
 import { GoBackButton } from "./goBackButton";
+import { AnimatePresence, motion } from "framer-motion/dist/framer-motion";
 
 const TraitBadges = [
   { field: 'indoor', color: 'green', display: 'Indoor', hint: 'Indoor cats live best inside.' },
@@ -41,11 +42,59 @@ const TraitBadges = [
   { field: 'natural', color: 'cyan', display: 'Natural', hint: 'Natural breeds have been found in nature.' },
 ];
 
+const MotionCard = motion(Card);
+const MotionGrid = motion(Grid);
+const MotionBox = motion(Box);
+const MotionBadge = motion(Badge);
+const MotionTraitBadge = motion(TraitBadge);
+const MotionCarouselSlide = motion(Carousel.Slide);
+
+const CarouselVariants = {
+  hidden: {
+    opacity: 0,
+    zIndex: 5,
+    transition: {
+      duration: 0.15,
+    }
+  },
+  visible: {
+    opacity: 1,
+    zIndex: 10,
+    transition: {
+      duration: 0.5,
+    }
+  }
+}
 
 export function CatBreed() {
   const { breedId } = useParams();
   const { breed, error } = useBreed(breedId);
-  const images = useBreedImageUrl(breedId, 5).slice(0, 5);
+  const imagesUrls = useBreedImageUrl(breedId, 5);
+  const referenceImage = useBreedReferenceImage(breed?.reference_image_id)
+
+  const images = useMemo(() => {
+    const images = {};
+    for (const image of [referenceImage, ...imagesUrls]) {
+      if (image && image?.id) {
+        images[image.id] = image;
+      }
+    }
+
+    return Object.values(images).map((image) => (
+      <img
+        key={image.id}
+        src={image.url}
+        alt={`Image of ${breed?.name} cat.`}
+        loading='eager'
+        style={{
+          objectFit: "cover",
+          height: '100%',
+          width: '100%',
+          position: 'absolute',
+        }}
+      />
+    ))
+  });
 
   useEffect(() => {
     setTimeout(() => {
@@ -58,12 +107,16 @@ export function CatBreed() {
 
   const learnMoreLinks = (
     breed && (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: rem(16), justifyContent: 'center', overflow: 'visible', flexWrap: 'wrap' }}>
+      <MotionBox
+        key='learn_more_links'
+        {...CardMotionProps}
+        sx={{ display: 'flex', alignItems: 'center', gap: rem(16), justifyContent: 'center', overflow: 'visible', flexWrap: 'wrap' }}
+      >
         {breed?.wikipedia_url && <IconLink Icon={BsWikipedia} href={breed.wikipedia_url} label="Learn more on Wikipedia" />}
         {breed?.vetstreet_url && <IconLink Icon={() => <LinkLogo src={VetstreetLogo} alt="Vetstreet" />} href={breed.vetstreet_url} label="Learn more on Vetstreet" />}
         {breed?.vcahospitals_url && <IconLink Icon={() => <LinkLogo src={VcaLogo} alt="VCA Hospitals logo" />} href={breed.vcahospitals_url} label="Learn more on VCA Hospitals" />}
         {breed?.cfa_url && <IconLink Icon={() => <LinkLogo src={CfaLogo} alt="CFA Logo" style={{ filter: "invert(1)" }} />} href={breed.cfa_url} label="Learn more on CFA" />}
-      </Box>
+      </MotionBox>
     )
   );
 
@@ -73,63 +126,59 @@ export function CatBreed() {
   )
 
   const description = (
-    isNotEmptyString(breed?.description) && <Card shadow="md" radius='lg' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
-      {
-        breed?.description && <Box>
-          <Text size='xs' transform='uppercase'>Description</Text>
-          <Text size='md' weight='normal' transform="capitalize">{breed?.description}</Text>
-        </Box>
-      }
-    </Card>
+    isNotEmptyString(breed?.description) && <MotionCard key='description' {...CardMotionProps} shadow="md" radius='lg' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
+      <Box>
+        <Text size='xs' transform='uppercase'>Description</Text>
+        <Text size='md' weight='normal'>{breed?.description}</Text>
+      </Box>
+    </MotionCard>
   );
 
   const alsoKnownAs = (
-    isNotEmptyString(breed?.alt_names) && <Card radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
+    isNotEmptyString(breed?.alt_names) && <MotionCard key='alt_names' {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Also known as</Text>
         <Text size='md' weight='normal' transform="capitalize">{breed?.alt_names}</Text>
       </Box>
-    </Card>
+    </MotionCard>
   );
 
   const temperament = (
-    isNotEmptyString(breed?.temperament) && <Card radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
+    isNotEmptyString(breed?.temperament) && <MotionCard key='temperament' {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16), padding: rem(32) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Temperament</Text>
         <Text size='md' weight='normal'>{breed?.temperament}</Text>
       </Box>
-    </Card>
+    </MotionCard>
   );
 
   const lifeSpan = (
-    isNotEmptyString(breed?.life_span) && <Card radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
+    isNotEmptyString(breed?.life_span) && <MotionCard key='life_span' {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Life Span</Text>
         <Text size='md' italic weight='normal'>{breed?.life_span} years</Text>
       </Box>
-    </Card>
+    </MotionCard>
   );
 
   const weightInStandard = (
-    isNotEmptyString(breed?.weight) && <Card radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
+    isNotEmptyString(breed?.weight.imperial) && <MotionCard key='weight' {...CardMotionProps} radius='md' shadow='md' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
       <Box>
         <Text size='xs' transform='uppercase'>Weight</Text>
         <Text size='md' italic weight='normal'>{breed?.weight.imperial} lbs</Text>
       </Box>
-    </Card>
+    </MotionCard>
   )
 
   const badges = (
     breed && <Box py={rem(16)} sx={{ display: 'flex', flexWrap: 'wrap', width: '100%', gap: rem(8), justifyContent: 'center' }}>
-      <Badge variant="outline" color='gray' size="lg" leftSection={<NationalFlag countryCode={breed?.country_code} />}>
+      <MotionBadge key='origin_badge' {...CardMotionProps} variant="outline" color='gray' size="lg" leftSection={<NationalFlag countryCode={breed?.country_code} />}>
         {breed?.origin ?? 'Unknown'}
-      </Badge>
+      </MotionBadge>
       {
         TraitBadges.map(({ field, color, display, icon, hint }) => (
-          <Tooltip key={field} label={hint}>
-            <Box sx={{ display: 'flex', '&:empty': { display: 'none' } }}>
-              <TraitBadge value={breed[field]} color={color} display={display} leftSection={icon} />
-            </Box>
+          <Tooltip key={field} label={hint} sx={{ '&:empty': { display: 'none' } }}>
+            <MotionTraitBadge key={`trait_${field}`} {...CardMotionProps} value={breed[field]} color={color} display={display} leftSection={icon} />
           </Tooltip>
         ))
       }
@@ -148,7 +197,7 @@ export function CatBreed() {
         position: 'relative',
       }}
     >
-      <Box sx={{}}>
+      <Box>
         <GoBackButton />
       </Box>
       <Title sx={{ fontSize: 'clamp(1rem, 7vw, 1.67rem)', textAlign: 'center' }}>{breed?.name}</Title>
@@ -158,11 +207,14 @@ export function CatBreed() {
 
   const image = (
     breed && <Card
+      key='carousel'
       radius='lg'
       shadow="md"
       sx={{
+        position: 'relative',
         width: '100%',
         alignItems: 'start',
+        aspectRatio: '1 / 1',
       }}
     >
       <Card.Section>
@@ -173,7 +225,7 @@ export function CatBreed() {
           aspectRatio: '1 / 1',
         }}>
           {
-            images.length > 1 && (
+            images.length >= 1 && (
               <Carousel
                 loop
                 withIndicators
@@ -193,9 +245,11 @@ export function CatBreed() {
                 }}
               >
                 {images.map((image, index) => (
-                  <Carousel.Slide
+                  <MotionCarouselSlide
+                    variants={CarouselVariants}
+                    exit='hidden'
+                    key={`img_${index}`}
                     onClick={() => { }}
-                    key={image.url}
                     sx={{
                       display: 'block',
                       height: '100%',
@@ -203,18 +257,8 @@ export function CatBreed() {
                       position: 'relative',
                     }}
                   >
-                    <img
-                      src={image.url}
-                      alt={`Image of ${breed?.name} cat.`}
-                      loading={index === 0 ? 'eager' : 'lazy'}
-                      style={{
-                        objectFit: "cover",
-                        height: '100%',
-                        width: '100%',
-                        position: 'absolute'
-                      }}
-                    />
-                  </Carousel.Slide>
+                    {image}
+                  </MotionCarouselSlide>
                 ))}
               </Carousel>
             )
@@ -244,45 +288,88 @@ export function CatBreed() {
         }}
       >
         {error && <Alert color='red' title="Failed to load breed!">{error}</Alert>}
-        {breed && (
-          <Grid sx={{ width: '100%', maxWidth: rem(1000), margin: '0 auto' }}>
-            <Grid.Col span={12}>
-              {title}
-            </Grid.Col>
-            <Grid.Col xs={12} sx={{ display: 'flex', flexDirection: "column", alignItems: 'start', gap: rem(16) }}>
-              <Grid>
-                <Grid.Col xs={12} sm={6} md={5} sx={{ display: 'flex', flexDirection: "column", alignItems: 'start' }}>
-                  <Grid gutter='none' grow sx={{ width: '100%', margin: '0 auto' }}>
-                    <Grid.Col span={12}>
-                      {image}
-                      {badges}
-                    </Grid.Col>
-                    <Grid.Col>
-                      <Grid grow>
-                        <Grid.Col span={6}>
-                          {lifeSpan}
-                        </Grid.Col>
-                        <Grid.Col span={6}>
-                          {weightInStandard}
-                        </Grid.Col>
-                      </Grid>
-                    </Grid.Col>
-                  </Grid>
-                </Grid.Col>
-                <Grid.Col xs={12} sm='auto' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
-                  {alsoKnownAs}
-                  {description}
-                  {temperament}
-                  {knownFor}
-                  <Space sx={{ flex: '1 1 auto' }} />
-                  {learnMoreLinks}
-                </Grid.Col>
-              </Grid>
-            </Grid.Col>
-          </Grid>
-        )}
-        <SimilarBreeds to={breed} />
+        <AnimatePresence>
+          {breed && (
+            <MotionGrid
+              key={breed.id}
+              initial='hidden'
+              animate='visible'
+              variants={GridVariants}
+              sx={{ width: '100%', maxWidth: rem(1000), margin: '0 auto' }}
+            >
+              <Grid.Col span={12}>
+                {title}
+              </Grid.Col>
+              <Grid.Col xs={12} sx={{ display: 'flex', flexDirection: "column", alignItems: 'start', gap: rem(16) }}>
+                <Grid>
+                  <Grid.Col xs={12} sm={6} md={5} sx={{ display: 'flex', flexDirection: "column", alignItems: 'start' }}>
+                    <Grid gutter='none' grow sx={{ width: '100%', margin: '0 auto' }}>
+                      <Grid.Col span={12}>
+                        {image}
+                        {badges}
+                      </Grid.Col>
+                      <Grid.Col>
+                        <Grid grow>
+                          <Grid.Col span={6}>
+                            {lifeSpan}
+                          </Grid.Col>
+                          <Grid.Col span={6}>
+                            {weightInStandard}
+                          </Grid.Col>
+                        </Grid>
+                      </Grid.Col>
+                    </Grid>
+                  </Grid.Col>
+                  <Grid.Col xs={12} sm='auto' sx={{ display: 'flex', flexDirection: 'column', gap: rem(16) }}>
+                    {alsoKnownAs}
+                    {description}
+                    {temperament}
+                    {knownFor}
+                    <Space sx={{ flex: '1 1 auto' }} />
+                    {learnMoreLinks}
+                  </Grid.Col>
+                </Grid>
+              </Grid.Col>
+            </MotionGrid>
+          )}
+          <SimilarBreeds to={breed} />
+        </AnimatePresence>
       </Box>
     </>
   );
+}
+
+const GridVariants = {
+  hidden: {
+    opacity: 0,
+  },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+    }
+  }
+}
+
+const CardVariants = {
+  hidden: {
+    opacity: 0,
+    y: 10
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      damping: 20,
+      stiffness: 100,
+      duration: 1
+    }
+  },
+}
+
+const CardMotionProps = {
+  // initial: 'hidden',
+  // whileInView: 'visible',
+  variants: CardVariants,
 }

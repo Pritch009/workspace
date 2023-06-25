@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { BsSearchHeart } from "react-icons/bs";
-import { Box, Input, rem, Title, Text, Alert, Portal, Stack, Grid, Group, Flex, Select, Pagination } from "@mantine/core";
+import { Box, Input, rem, Text, Alert, Stack, Grid, Group, Flex, Select, Pagination, Loader } from "@mantine/core";
 import { useBreeds } from "../APIs/cats";
 import Fuse from "fuse.js";
 import { useFilter } from "../contexts/filterContext";
@@ -10,6 +10,7 @@ import { EmptyBreedImage } from "./emptyBreedImage";
 import { HiddenModal } from "./hiddenModal";
 import { useCoupledState } from "../hooks/useCoupledState";
 import { useLocalState } from "../hooks/useLocalState";
+import { AnimatePresence, motion } from "framer-motion/dist/framer-motion";
 
 const fuseOptions = {
   includeScore: true,
@@ -39,11 +40,12 @@ function compareBreedFields(field, ascending) {
   }
 }
 
+const MotionGridCol = motion(Grid.Col);
+
 export function SearchBar() {
   const { data: breeds, loading: loadingBreeds, error } = useBreeds();
   const [err, setErr] = useState(null);
   const [searchValue, setSearchValue] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
   const [sortFn, setSortFn] = useLocalState(
     '',
     'Relevancy',
@@ -76,11 +78,10 @@ export function SearchBar() {
     }
   }, [filter]);
 
-  const suggestionWindow = useMemo(() => {
-    return suggestions.slice(page * pageSize, (page + 1) * pageSize);
-  }, [suggestions, page, pageSize]);
-  const numPages = useMemo(() => Math.ceil(suggestions.length / pageSize), [suggestions, pageSize]);
-  useEffect(() => {
+  /// All suggestions that match the search query
+  /// We may not reduce here because we want to preserve the order of the results
+  /// Filtering is managed by Fuse
+  const suggestions = useMemo(() => {
     if (breeds && breeds.length > 0) {
       let ordered;
       if (searchValue.length > 0) {
@@ -99,18 +100,24 @@ export function SearchBar() {
           })
           .map((breed) => ({ breed, score: 0 }));
       }
-      setSuggestions(ordered);
+      return ordered;
     }
+    return [];
   }, [breeds, searchValue, fuseFilter, filter]);
 
-  useEffect(() => {
-    if (suggestions.length > 0) {
-      let sorter = SortFunctions[sortFn] ?? SortFunctions.Alphabetical;
-      setSuggestions([
-        ...suggestions.sort(sorter)
-      ])
-    }
-  }, [sortFn]);
+  /// Number of pages of results
+  const numPages = useMemo(() => Math.ceil(suggestions.length / pageSize), [suggestions, pageSize]);
+
+  /// Sorting the suggestions may change the overall order, but not the number of results
+  const sortedSuggestions = useMemo(() => {
+    let sorter = SortFunctions[sortFn] ?? SortFunctions.Alphabetical;
+    return suggestions.sort(sorter);
+  }, [suggestions, sortFn]);
+
+  /// Used for pagination
+  const suggestionWindow = useMemo(() => {
+    return sortedSuggestions.slice(page * pageSize, (page + 1) * pageSize);
+  }, [sortedSuggestions, page, pageSize]);
 
   const onChange = (event) => {
     const newValue = event.currentTarget.value;
@@ -160,76 +167,97 @@ export function SearchBar() {
             <HiddenModal />
           </Flex>
           {
-            suggestions.length > 0 && (
-              <>
-                <Grid gutter='lg' justify="start" w='auto' align="start" sx={{ flex: '1 1 auto', alignContent: 'start' }}>
-                  {suggestionWindow
-                    .map(({ breed: suggestion }, index) => (
-                      <Grid.Col
-                        span={6}
-                        xs={4}
-                        sm={3}
-                        key={suggestion.id}
-                        sx={{
-                          flex: `1 0 ${rem(242)}`,
-                          aspectRatio: '1/1',
-                          '&:empty': {
-                            display: 'none',
-                          }
-                        }}
-                      >
-                        <SearchOption
-                          index={index}
-                          breed={suggestion}
-                        />
-                      </Grid.Col>
-                    ))
-                  }
-                </Grid>
-                {
-                  numPages > 1 && (
-                    <Flex justify='center' p={rem(32)}>
-                      <Pagination
-                        page={page + 1}
-                        onChange={onSetPage}
-                        total={numPages}
-                        siblings={1}
-                        color='blue'
-                        radius='md'
-                        withControls={false}
-                      />
-                    </Flex>
-                  )
-                }
-              </>
-            )
-          }
-          {
-            suggestions.length === 0 && (
-              <Stack
-                w='100%'
-                p={rem(32)}
-                align='center'
-                justify="center"
-              >
-                <Box sx={{
-                  height: 200,
-                  width: 200,
-                }}>
-                  <EmptyBreedImage />
-                </Box>
-                <Text size='sm'>
-                  No results found
-                </Text>
+            loadingBreeds ? (
+              <Stack w='100%' size='xl' align="center" justify="center" sx={{ flex: '1 1 auto' }}>
+                <Loader />
               </Stack>
             )
+              : suggestionWindow.length > 0 ? (
+                <>
+                  <Grid mt={rem(8)} gutter='lg' justify="start" w='auto' align="start" sx={{ flex: '1 1 auto', alignContent: 'start' }}>
+                    <AnimatePresence>
+                      {suggestionWindow
+                        .map(({ breed: suggestion }, index) => (
+                          <MotionGridCol
+                            initial='hidden'
+                            animate='visible'
+                            variants={BreedCardVariants(index)}
+                            key={suggestion.id}
+                            span={6}
+                            xs={4}
+                            ms={3}
+                            sx={{
+                              flex: `1 0 ${rem(242)}`,
+                              aspectRatio: '1/1',
+                              '&:empty': {
+                                display: 'none',
+                              }
+                            }}
+                          >
+                            <SearchOption
+                              index={index}
+                              breed={suggestion}
+                            />
+                          </MotionGridCol>
+                        ))
+                      }
+                    </AnimatePresence>
+                  </Grid>
+                  {
+                    numPages > 1 && (
+                      <Flex justify='center' p={rem(32)}>
+                        <Pagination
+                          page={page + 1}
+                          onChange={onSetPage}
+                          total={numPages}
+                          siblings={1}
+                          color='blue'
+                          radius='md'
+                          withControls={false}
+                        />
+                      </Flex>
+                    )
+                  }
+                </>
+              ) : (
+                <Stack
+                  w='100%'
+                  p={rem(32)}
+                  align='center'
+                  justify="center"
+                >
+                  <Box sx={{
+                    height: 200,
+                    width: 200,
+                  }}>
+                    <EmptyBreedImage />
+                  </Box>
+                  <Text size='sm'>
+                    No results found
+                  </Text>
+                </Stack>
+              )
           }
         </>
-      )
-      }
+      )}
     </Stack >
   );
 }
+
+const BreedCardVariants = (index) => ({
+  hidden: {
+    opacity: 0,
+    y: 10
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      delay: index * 0.05,
+    }
+  }
+});
 
 function SearchOption({ breed, index, ...props }) {
   return <BreedLinkCard breed={breed} />

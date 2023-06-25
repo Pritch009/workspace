@@ -126,7 +126,8 @@ export function useBreed(breedId) {
 
 export function useBreedReferenceImage(reference_image_id) {
   const [state, setState] = useLocalState(`image.${reference_image_id}`, null);
-  const [{ data }, fetch] = useAxios(
+
+  const [{ data, loading }, fetch] = useAxios(
     {
       url: `https://api.thecatapi.com/v1/images/${reference_image_id}`,
       method: "GET",
@@ -135,35 +136,41 @@ export function useBreedReferenceImage(reference_image_id) {
   );
 
   useEffect(() => {
-    if (reference_image_id && !state) {
-      fetch();
+    if (reference_image_id && !state || state?.id !== reference_image_id) {
+      fetch().catch(() => { });
     }
   }, [reference_image_id]);
 
   useEffect(() => {
     if (data) {
-      setState(pick(data, ['url']));
+      setState(pick(data, ['url', 'id']));
     }
   }, [data]);
 
-  return state ?? null;
+  return loading ? undefined : (state ?? null);
 }
 
 export function useBreedImageUrl(breedId, limit = 1) {
-  const [state, setState] = useLocalState(`carousel.${breedId}`, null);
-  const [{ data }] = useAxios(
+  const [state, setState] = useLocalState(`carousel.${breedId}.${limit}`, null);
+  const [{ data }, fetch] = useAxios(
     {
       url: `https://api.thecatapi.com/v1/images/search?limit=${limit}&breed_ids=${breedId}`,
       method: "GET",
     },
-    { manual: false }
+    { manual: true }
   );
 
   useEffect(() => {
+    if (breedId && (!state || state?.[0]?.breeds?.[0]?.id !== breedId)) {
+      fetch().catch(() => { });
+    }
+  }, [breedId]);
+
+  useEffect(() => {
     if (data) {
-      setState(data.map((image) => pick(image, ['url'])));
+      setState(data.map((image) => pick(image, ['url', 'id'])));
     }
   }, [data]);
 
-  return data ?? [];
+  return state ?? [];
 }

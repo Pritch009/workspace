@@ -1,4 +1,4 @@
-import { ActionIcon, Card, Space, Text, useMantineTheme, Box, rem } from "@mantine/core";
+import { ActionIcon, Card, Space, Text, useMantineTheme, Box, rem, Skeleton } from "@mantine/core";
 import { useBreedImageUrl, useBreedReferenceImage } from "../APIs/cats";
 import { Link } from "react-router-dom";
 import { EmptyBreedImage } from "./emptyBreedImage";
@@ -11,6 +11,9 @@ import { BiShow } from "react-icons/bi";
 
 export function BreedLinkCard({ breed, ignoreHidden = false }) {
     const image = useBreedReferenceImage(breed?.reference_image_id);
+    const [backupImage] = useBreedImageUrl(image === null ? breed?.id : undefined, 1);
+    const imageUrl = useMemo(() => image?.url ?? backupImage?.url, [image, backupImage]);
+    const loadingImage = useMemo(() => imageUrl === undefined && backupImage === undefined, [image, backupImage]);
     const theme = useMantineTheme();
     const [emphasizeHideButton, setEmphasizeHideButton] = useState(false);
     const { isHidden, hide, show } = useIsHidden(breed);
@@ -72,7 +75,12 @@ export function BreedLinkCard({ breed, ignoreHidden = false }) {
                     width: '100%',
                 }
             }}>
-                {image?.url && (
+                {loadingImage && (
+                    <Skeleton
+                        sx={{ position: 'absolute', top: 0, left: 0, height: '100%', width: '100%' }}
+                    />
+                )}
+                {!loadingImage && imageUrl && (
                     <img
                         src={image?.url}
                         loading='lazy'
@@ -83,7 +91,7 @@ export function BreedLinkCard({ breed, ignoreHidden = false }) {
                         }}
                     />
                 )}
-                {!image?.url && (
+                {!loadingImage && !imageUrl && (
                     <EmptyBreedImage />
                 )}
                 <Text
