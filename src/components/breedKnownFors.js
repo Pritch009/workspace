@@ -182,13 +182,15 @@ export function BreedKnownFors({ breed }) {
     }, [breed]);
 
     return (
-        <Box px={rem(8)} py={rem(16)} sx={{ display: 'flex', flexDirection: 'row', width: "100%", boxSizing: "border-box", justifyContent: 'center', alignItems: 'center', gap: rem(16), flexWrap: 'wrap' }}>
-            {values.map(([key, value]) => (
-                <Fragment key={key}>
-                    {value}
-                </Fragment>
-            ))}
-        </Box>
+        <Box p={rem(16)} sx={{ display: 'flex', flexDirection: 'row', width: "100%", boxSizing: "border-box", justifyContent: 'center', alignItems: 'center', gap: rem(16), flexWrap: 'wrap' }}>
+            {
+                values.map(([key, value]) => (
+                    <Fragment key={key}>
+                        {value}
+                    </Fragment>
+                ))
+            }
+        </Box >
     );
 }
 

@@ -19,10 +19,6 @@ import { useBreedImageUrl, useBreed } from "../APIs/cats";
 import { BsWikipedia, BsFillHeartFill } from "react-icons/bs";
 import { BiHomeSmile } from "react-icons/bi";
 import { MdArrowBack, MdChildFriendly, MdEnergySavingsLeaf } from "react-icons/md";
-import { FaDog, FaCat, FaSmileBeam, FaLeaf, FaCouch } from "react-icons/fa";
-import { RiKakaoTalkFill } from "react-icons/ri";
-import { IoPeople } from "react-icons/io5";
-import { GiHairStrands, GiComb, GiHealthNormal, GiBrain } from "react-icons/gi";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { BreedKnownFors } from "./breedKnownFors";
 import CfaLogo from '../assets/cfa-logo.png';
@@ -253,7 +249,7 @@ export function CatBreed() {
         alignItems: 'center',
         justifyContent: 'center',
         gridTemplateColumns: '1fr auto 1fr',
-        gap: rem(8),
+        gap: rem(16),
         width: '100%',
         position: 'relative',
       }}
@@ -274,11 +270,13 @@ export function CatBreed() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          paddingLeft: rem(16),
+          paddingRight: rem(16),
           paddingBottom: rem(48),
           overflow: 'hidden',
         }}
       >
-        {error && <Alert title="Failed to load breed!">{error}</Alert>}
+        {error && <Alert color='red' title="Failed to load breed!">{error}</Alert>}
         {breed && (
           <Grid sx={{ width: '100%', maxWidth: rem(1000), margin: '0 auto' }}>
             <Grid.Col span={12}>

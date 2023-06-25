@@ -3,7 +3,7 @@ export function pick(val, fields) {
         return val;
     }
     return Object.fromEntries(
-        fields.map((field) => [field, val[field]])
+        fields.map((field) => [field, val[field]]).filter(([_, val]) => val !== undefined)
     )
 }
 

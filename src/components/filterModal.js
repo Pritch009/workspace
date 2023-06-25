@@ -23,7 +23,8 @@ export function FilterModal() {
     }
 
     const count = useMemo(() => {
-        const numKeys = Object.keys(filterState).filter((field) => field.localeCompare('country_code') !== 0).length;
+        const numKeys = Object.keys(filterState).filter((field) => field && field.localeCompare('country_code') !== 0).length;
+        console.log(numKeys, filterState);
         if (numKeys === 0) {
             return null;
         }
@@ -31,7 +32,7 @@ export function FilterModal() {
     }, [filterState]);
 
     return <>
-        <Flex gap={rem(8)} sx={{ flex: '1 1 auto' }} align='center' justify='end'>
+        <Flex gap={rem(16)} sx={{ flex: '1 1 auto' }} align='center' justify='end'>
             {count && <Button variant='subtle' size="sm" leftIcon={<MdClose />} onClick={clearFilter}>Clear</Button>}
             <Button leftIcon={<BsFilter />} onClick={openFilter} rightIcon={count}>Filter</Button>
         </Flex>

@@ -73,7 +73,7 @@ export function FilterContext({ children }) {
         if (typeof filterState !== 'object') {
             return null;
         }
-        return pick(filterState, Object.keys(FilterOptions).map(({ field }) => field));
+        return pick(filterState, FilterOptions.map(({ field }) => field));
     });
 
     return <filterContext.Provider value={filterState}>
