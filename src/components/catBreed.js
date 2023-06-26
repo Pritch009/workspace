@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState, useCallback } from "react";
 import {
   Box,
   Title,
@@ -32,6 +32,7 @@ import { IconLink, LinkLogo } from "./iconLink";
 import { GoBackButton } from "./goBackButton";
 import { AnimatePresence, motion } from "framer-motion/dist/framer-motion";
 import { useClickOutside, useViewportSize } from "@mantine/hooks";
+import { useWidthBreakpoint } from "../hooks/useMinScreen";
 
 const TraitBadges = [
   { field: 'indoor', color: 'green', display: 'Indoor', hint: 'Indoor cats live best inside.' },
@@ -114,10 +115,19 @@ export function CatBreed() {
   const imagesUrls = useBreedImageUrl(breed?.id, 5);
   const referenceImage = useBreedReferenceImage(breed);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const isMinSm = useWidthBreakpoint('sm');
 
-  const onToggleImageEmphasis = (event) => {
-    setEmphasizeImage((prev) => !prev);
-  }
+  const onToggleImageEmphasis = useCallback((event) => {
+    if (isMinSm) {
+      setEmphasizeImage((prev) => !prev);
+    }
+  }, [isMinSm]);
+
+  useEffect(() => {
+    if (emphasizeImage && !isMinSm) {
+      setEmphasizeImage(false);
+    }
+  }, [emphasizeImage, isMinSm]);
 
 
   const images = useMemo(() => {
@@ -284,11 +294,13 @@ export function CatBreed() {
               variants={GridVariants}
               sx={{ width: '100%', maxWidth: rem(1000), margin: '0 auto', padding: 0 }}
             >
-              <Grid.Col span={12}>
+              <Grid.Col px={rem(16)} span={12}>
                 {title}
               </Grid.Col>
-              <Grid.Col xs={12} sx={{ width: '100%', display: 'flex', flexDirection: "column", alignItems: emphasizeImage ? 'center' : 'start', gap: rem(16) }}>
-                <Grid>
+              <Grid.Col px={rem(16)} xs={12} sx={{ width: '100%', display: 'flex', flexDirection: "column", alignItems: emphasizeImage ? 'center' : 'start', gap: rem(16) }}>
+                <Grid
+                  w={emphasizeImage ? '100%' : 'auto'}
+                >
                   <Grid.Col
                     {...(emphasizeImage ? { xs: 12 } : { xs: 12, sm: 6, md: 5 })}
                     sx={{ display: 'flex', flexDirection: "column", alignItems: 'start' }}
@@ -357,24 +369,11 @@ export function CatBreed() {
  * @returns {JSX.Element}
  */
 function ImageCarousel({ images, onDoubleClick, emphasized, index, setCarouselIndex }) {
-  const { width } = useViewportSize();
-  const theme = useMantineTheme();
-
-  const shouldEmphasize = useMemo(() => {
-    return emphasized && width > theme.breakpoints.sm;
-  }, [emphasized])
-
   const ref = useClickOutside(() => {
     if (emphasized) {
       onDoubleClick();
     }
   });
-
-  useEffect(() => {
-    if (emphasized && !shouldEmphasize) {
-      onDoubleClick();
-    }
-  }, [shouldEmphasize, emphasized])
 
   /// Carousel Images
   const imageElements = useMemo(() => {
@@ -385,7 +384,6 @@ function ImageCarousel({ images, onDoubleClick, emphasized, index, setCarouselIn
         key={`img_${image.id}`}
         variants={CarouselVariants}
         onDoubleClick={onDoubleClick}
-        layout
         exit='hidden'
         sx={{
           display: 'block',
@@ -420,8 +418,8 @@ function ImageCarousel({ images, onDoubleClick, emphasized, index, setCarouselIn
     images.length > 0 ? (
       <Carousel
         loop
-        ref={shouldEmphasize ? ref : null}
-        key={`carousel_${shouldEmphasize}`}
+        ref={emphasized ? ref : null}
+        key={`carousel_${emphasized}`}
         onSlideChange={setCarouselIndex}
         initialSlide={index}
         withIndicators
@@ -446,5 +444,5 @@ function ImageCarousel({ images, onDoubleClick, emphasized, index, setCarouselIn
     ) : <Stack align="center" justify="center" h='100%' w='100%' sx={{ aspectRatio: '1/1' }}>
       <EmptyBreedImage />
     </Stack>
-  ), [imageElements, shouldEmphasize]);
+  ), [imageElements, emphasized]);
 }

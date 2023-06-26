@@ -81,7 +81,7 @@ export function SimilarBreeds({ to }) {
                     overflow: 'auto'
                 }}
             >
-                <Flex wrap='nowrap' gap='lg' h={200} justify='start' align='center' mx='auto' px={rem(16)}>
+                <Flex wrap='nowrap' gap='lg' h={200} justify='start' align='center' mx='auto'>
                     {
                         topSimilar
                             .slice(0, 5)
